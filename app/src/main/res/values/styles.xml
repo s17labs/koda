@@ -1,0 +1,16 @@
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/kodaDarkBlue</item>
+        <item name="colorPrimaryDark">@color/kodaDark</item>
+        <item name="colorAccent">@color/kodaLightBlue</item>
+        <item name="android:windowBackground">@color/kodaEditorBg</item>
+        <item name="android:statusBarColor">@color/kodaDarkBlue</item>
+        <item name="android:navigationBarColor">@color/kodaEditorBg</item>
+        <item name="android:popupMenuStyle">@style/KodaPopupMenu</item>
+        <item name="actionDropDownStyle">@style/KodaPopupMenu</item>
+    </style>
+
+    <style name="KodaPopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@color/kodaDark</item>
+    </style>
+</resources>

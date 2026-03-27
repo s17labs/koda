@@ -1,0 +1,60 @@
+<resources>
+    <string name="app_name">Koda</string>
+    
+    <!-- Main -->
+    <string name="start_typing">Start typing…</string>
+    
+    <!-- Menu -->
+    <string name="menu_new">New</string>
+    <string name="menu_open">Open</string>
+    <string name="menu_save">Save</string>
+    <string name="menu_save_as">Save As</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_exit">Exit</string>
+    
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_main">Main Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_about">About</string>
+    
+    <string name="setting_open_last">Open Last</string>
+    <string name="setting_open_last_desc">Opens last edited file when app opens</string>
+    <string name="setting_auto_save">Auto Save</string>
+    <string name="setting_auto_save_desc">Automatically save currently editing file when window is closed</string>
+    <string name="setting_wrap_lines">Wrap Lines</string>
+    <string name="setting_wrap_lines_desc">Wrap the line if text is too long</string>
+    <string name="setting_wake_lock">Use WakeLock</string>
+    <string name="setting_wake_lock_desc">Prevent device going to sleep mode</string>
+    
+    <string name="setting_language">Language</string>
+    <string name="setting_font">Font</string>
+    <string name="setting_font_size">Font Size</string>
+    <string name="choose_language">Choose Language</string>
+    <string name="choose_font">Choose a font type</string>
+    <string name="choose_font_size">Choose a font size</string>
+    
+    <string name="version">Version</string>
+    <string name="about_koda">About Koda</string>
+    <string name="about_koda_desc">Just a little FYI</string>
+    <string name="about_content">This is a clean and simple Android text editor made in Kotlin.\n\nFor more visit: https://github.com/s17labs/koda</string>
+    
+    <!-- Dialogs -->
+    <string name="unsaved_changes">Unsaved Changes</string>
+    <string name="unsaved_changes_message">You have unsaved changes. Do you want to save before exiting?</string>
+    <string name="save_and_exit">Save &amp; Exit</string>
+    <string name="exit_without_saving">Exit Without Saving</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="save">Save</string>
+    <string name="dont_save">Don\'t Save</string>
+    <string name="save_changes">Do you want to save changes to %1$s?</string>
+    
+    <!-- Messages -->
+    <string name="nothing_to_save">Nothing to save</string>
+    <string name="file_saved">File saved</string>
+    <string name="error_saving">Error saving file: %1$s</string>
+    <string name="error_opening">Error opening file: %1$s</string>
+    <string name="settings_coming_soon">Settings coming soon</string>
+    <string name="language_changed">Language changed to %1$s</string>
+</resources>

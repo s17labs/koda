@@ -1,0 +1,57 @@
+<resources>
+    <string name="app_name">Koda</string>
+    
+    <!-- Main -->
+    <string name="start_typing">开始输入…</string>
+    
+    <!-- Menu -->
+    <string name="menu_new">新建</string>
+    <string name="menu_open">打开</string>
+    <string name="menu_save">保存</string>
+    <string name="menu_save_as">另存为</string>
+    <string name="menu_settings">设置</string>
+    <string name="menu_exit">退出</string>
+    
+    <!-- Settings -->
+    <string name="settings_title">设置</string>
+    <string name="settings_main">主要设置</string>
+    <string name="settings_appearance">外观</string>
+    <string name="settings_about">关于</string>
+    
+    <string name="setting_open_last">打开上次文件</string>
+    <string name="setting_open_last_desc">打开应用时打开上次编辑的文件</string>
+    <string name="setting_auto_save">自动保存</string>
+    <string name="setting_auto_save_desc">关闭窗口时自动保存当前编辑的文件</string>
+    <string name="setting_wrap_lines">自动换行</string>
+    <string name="setting_wrap_lines_desc">文本过长时自动换行</string>
+    <string name="setting_wake_lock">保持唤醒</string>
+    <string name="setting_wake_lock_desc">防止设备进入睡眠模式</string>
+    
+    <string name="setting_language">语言</string>
+    <string name="setting_font">字体</string>
+    <string name="setting_font_size">字体大小</string>
+    <string name="choose_language">选择语言</string>
+    <string name="choose_font">选择字体类型</string>
+    <string name="choose_font_size">选择字体大小</string>
+    
+    <string name="version">版本</string>
+    <string name="about_koda">关于 Koda</string>
+    <string name="about_koda_desc">一点小提示</string>
+    <string name="about_content">这是一个简洁易用的 Android 文本编辑器，由 Kotlin 编写。\n\n了解更多：https://github.com/s17labs/koda</string>
+    
+    <!-- Dialogs -->
+    <string name="unsaved_changes">未保存的更改</string>
+    <string name="unsaved_changes_message">您有未保存的更改。是否要在退出前保存？</string>
+    <string name="save_and_exit">保存并退出</string>
+    <string name="exit_without_saving">不保存退出</string>
+    <string name="cancel">取消</string>
+    <string name="ok">确定</string>
+    
+    <!-- Messages -->
+    <string name="nothing_to_save">没有内容需要保存</string>
+    <string name="file_saved">文件已保存</string>
+    <string name="error_saving">保存文件出错：%1$s</string>
+    <string name="error_opening">打开文件出错：%1$s</string>
+    <string name="settings_coming_soon">即将推出设置</string>
+    <string name="language_changed">语言已更改为 %1$s</string>
+</resources>

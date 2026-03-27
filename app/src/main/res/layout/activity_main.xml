@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/kodaEditorBg"
+    android:fitsSystemWindows="true">
+
+    <RelativeLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/kodaDarkBlue"
+        android:paddingHorizontal="8dp">
+
+        <TextView
+            android:id="@+id/toolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:text="Koda"
+            android:textColor="@color/kodaText"
+            android:textSize="34sp"
+            android:textStyle="bold"
+            android:paddingStart="8dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnMenu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Menu"
+                android:src="@drawable/ic_menu"
+                app:tint="@color/kodaText" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/tabScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/kodaTabInactive"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/tabContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" />
+
+    </HorizontalScrollView>
+
+    <EditText
+        android:id="@+id/textEditor"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/kodaEditorBg"
+        android:gravity="top|start"
+        android:hint="@string/start_typing"
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:padding="16dp"
+        android:textColor="@color/editorText"
+        android:textColorHint="@color/kodaTextSecondary"
+        android:textSize="14sp"
+        android:typeface="monospace" />
+
+</LinearLayout>
