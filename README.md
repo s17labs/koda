@@ -17,7 +17,7 @@ A clean and lightweight Android text editor built with Kotlin.
 ## 🚀 Getting Started
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/koda.git
+   git clone https://github.com/s17labs/koda.git
    ```
 2. Open the project in Android Studio
 3. Build & run on an emulator or device
