@@ -78,7 +78,8 @@
         android:id="@+id/contentFrame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:fitsSystemWindows="true">
 
         <include
             android:id="@+id/startPage"
@@ -90,19 +91,29 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <EditText
-                android:id="@+id/textEditor"
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/kodaEditorBg"
-                android:gravity="top|start"
-                android:hint="@string/start_typing"
-                android:inputType="textMultiLine|textNoSuggestions"
-                android:padding="16dp"
-                android:textColor="@color/kodaText"
-                android:textColorHint="@color/kodaTextSecondary"
-                android:textSize="14sp"
-                android:typeface="monospace" />
+                android:fillViewport="true"
+                android:scrollbars="vertical"
+                android:scrollbarStyle="insideInset">
+
+                <EditText
+                    android:id="@+id/textEditor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/kodaEditorBg"
+                    android:gravity="top|start"
+                    android:hint="@string/start_typing"
+                    android:inputType="textMultiLine|textNoSuggestions"
+                    android:padding="16dp"
+                    android:textColor="@color/kodaText"
+                    android:textColorHint="@color/kodaTextSecondary"
+                    android:textSize="14sp"
+                    android:typeface="monospace"
+                    android:scrollbars="vertical" />
+
+            </ScrollView>
 
         </LinearLayout>
 
