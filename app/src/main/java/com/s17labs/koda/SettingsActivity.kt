@@ -10,12 +10,8 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
-import android.text.style.StyleSpan
-import android.graphics.Typeface
 import android.view.View
-import android.widget.Button
 import android.widget.LinearLayout
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -26,10 +22,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var prefs: SharedPreferences
 
-    private lateinit var switchOpenLast: Switch
-    private lateinit var switchAutoSave: Switch
-    private lateinit var switchWrapLines: Switch
-    private lateinit var switchWakeLock: Switch
+    private lateinit var switchOpenLast: CustomToggleView
+    private lateinit var switchAutoSave: CustomToggleView
+    private lateinit var switchWrapLines: CustomToggleView
+    private lateinit var switchWakeLock: CustomToggleView
 
     private lateinit var textLanguageValue: TextView
     private lateinit var textFontValue: TextView
@@ -84,19 +80,19 @@ class SettingsActivity : AppCompatActivity() {
         val versionName = BuildConfig.VERSION_NAME
         textVersion.text = "v$versionName"
 
-        switchOpenLast.setOnCheckedChangeListener { _, isChecked ->
+        switchOpenLast.setOnCheckedChangeListener { isChecked ->
             prefs.edit().putBoolean("open_last", isChecked).apply()
         }
 
-        switchAutoSave.setOnCheckedChangeListener { _, isChecked ->
+        switchAutoSave.setOnCheckedChangeListener { isChecked ->
             prefs.edit().putBoolean("auto_save", isChecked).apply()
         }
 
-        switchWrapLines.setOnCheckedChangeListener { _, isChecked ->
+        switchWrapLines.setOnCheckedChangeListener { isChecked ->
             prefs.edit().putBoolean("wrap_lines", isChecked).apply()
         }
 
-        switchWakeLock.setOnCheckedChangeListener { _, isChecked ->
+        switchWakeLock.setOnCheckedChangeListener { isChecked ->
             prefs.edit().putBoolean("wake_lock", isChecked).apply()
         }
 

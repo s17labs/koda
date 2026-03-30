@@ -64,7 +64,7 @@
 
             </LinearLayout>
 
-            <Switch
+            <com.s17labs.koda.CustomToggleView
                 android:id="@+id/switchOpenLast"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -103,7 +103,7 @@
 
             </LinearLayout>
 
-            <Switch
+            <com.s17labs.koda.CustomToggleView
                 android:id="@+id/switchAutoSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -142,7 +142,7 @@
 
             </LinearLayout>
 
-            <Switch
+            <com.s17labs.koda.CustomToggleView
                 android:id="@+id/switchWrapLines"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -181,7 +181,7 @@
 
             </LinearLayout>
 
-            <Switch
+            <com.s17labs.koda.CustomToggleView
                 android:id="@+id/switchWakeLock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
