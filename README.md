@@ -29,10 +29,13 @@ A clean and lightweight Android text editor built with Kotlin.
 ## 📁 Project Structure
 ```
 app/
- ├── java/com/s17labs/koda
- ├── res/
- └── AndroidManifest.xml
+  ├── java/com/s17labs/koda
+  ├── res/
+  └── AndroidManifest.xml
 ```
+
+## 🤝 Contributing
+Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) for details on how to add translations and other improvements.
 
 ## 📄 License
 This project is licensed under the MIT License.
