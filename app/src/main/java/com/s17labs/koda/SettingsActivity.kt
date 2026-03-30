@@ -4,18 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
-import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import java.util.Locale
 
@@ -201,17 +194,17 @@ class SettingsActivity : AppCompatActivity() {
         val currentLanguage = prefs.getString("language", "English")
         val currentIndex = languages.indexOf(currentLanguage).coerceAtLeast(0)
 
-        AlertDialog.Builder(this)
-            .setTitle(R.string.choose_language)
-            .setSingleChoiceItems(languages.toTypedArray(), currentIndex) { dialog, which ->
-                val selected = languages[which]
+        CustomOptionDialog(this)
+            .setTitle(getString(R.string.choose_language))
+            .setOptions(languages, currentIndex)
+            .setOnOkClickListener { index ->
+                val selected = languages[index]
                 prefs.edit().putString("language", selected).apply()
                 textLanguageValue.text = selected
-                dialog.dismiss()
                 Toast.makeText(this, getString(R.string.language_changed, selected), Toast.LENGTH_SHORT).show()
                 recreate()
             }
-            .setNegativeButton(R.string.cancel, null)
+            .setOnCancelClickListener { }
             .show()
     }
 
@@ -219,10 +212,11 @@ class SettingsActivity : AppCompatActivity() {
         val currentFont = prefs.getString("font", "Monospace")
         val currentIndex = fonts.indexOf(currentFont).coerceAtLeast(0)
 
-        AlertDialog.Builder(this)
-            .setTitle(R.string.choose_font)
-            .setSingleChoiceItems(fonts.toTypedArray(), currentIndex) { dialog, which ->
-                val selected = fonts[which]
+        CustomOptionDialog(this)
+            .setTitle(getString(R.string.choose_font))
+            .setOptions(fonts, currentIndex)
+            .setOnOkClickListener { index ->
+                val selected = fonts[index]
                 prefs.edit().putString("font", selected).apply()
                 textFontValue.text = selected
                 textFontValue.typeface = when (selected) {
@@ -230,9 +224,8 @@ class SettingsActivity : AppCompatActivity() {
                     "Sans Serif" -> android.graphics.Typeface.SANS_SERIF
                     else -> android.graphics.Typeface.MONOSPACE
                 }
-                dialog.dismiss()
             }
-            .setNegativeButton(R.string.cancel, null)
+            .setOnCancelClickListener { }
             .show()
     }
 
@@ -240,43 +233,23 @@ class SettingsActivity : AppCompatActivity() {
         val currentSize = prefs.getString("font_size", "M")
         val currentIndex = fontSizes.indexOf(currentSize).coerceAtLeast(0)
 
-        AlertDialog.Builder(this)
-            .setTitle(R.string.choose_font_size)
-            .setSingleChoiceItems(fontSizes.toTypedArray(), currentIndex) { dialog, which ->
-                val selected = fontSizes[which]
+        CustomOptionDialog(this)
+            .setTitle(getString(R.string.choose_font_size))
+            .setOptions(fontSizes, currentIndex)
+            .setOnOkClickListener { index ->
+                val selected = fontSizes[index]
                 prefs.edit().putString("font_size", selected).apply()
                 textFontSizeValue.text = selected
-                dialog.dismiss()
             }
-            .setNegativeButton(R.string.cancel, null)
+            .setOnCancelClickListener { }
             .show()
     }
 
     private fun showAboutDialog() {
-        val spannableString = SpannableString(getString(R.string.about_content))
-        val linkStart = spannableString.indexOf("https://github.com/s17labs/koda")
-        val linkEnd = linkStart + "https://github.com/s17labs/koda".length
-
-        spannableString.setSpan(object : ClickableSpan() {
-            override fun onClick(widget: View) {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/s17labs/koda"))
-                startActivity(intent)
-            }
-
-            override fun updateDrawState(ds: android.text.TextPaint) {
-                super.updateDrawState(ds)
-                ds.isUnderlineText = true
-            }
-        }, linkStart, linkEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-        val dialog = AlertDialog.Builder(this)
-            .setTitle(R.string.about_koda)
-            .setMessage(spannableString)
-            .setPositiveButton(R.string.ok, null)
-            .create()
-
-        dialog.show()
-        dialog.findViewById<android.widget.TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
+        val versionName = BuildConfig.VERSION_NAME
+        CustomAboutDialog(this)
+            .setVersion(versionName)
+            .show()
     }
 
     companion object {
