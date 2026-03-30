@@ -142,24 +142,37 @@ class DebugLogActivity : AppCompatActivity() {
 
     private fun refreshLog() {
         val logs = DebugLog.getLogs()
-        if (logs.isEmpty()) {
+        val crashLog = DebugLog.getCrashLog()
+
+        if (logs.isEmpty() && (crashLog.isNullOrEmpty())) {
             textLog.text = getString(R.string.no_logs)
             return
         }
 
-        val coloredLog = logs.joinToString("\n\n") { entry ->
-            val color = when (entry.type) {
-                DebugLog.LogType.ERROR, DebugLog.LogType.CRASH -> "#FF6B6B"
-                DebugLog.LogType.WARNING -> "#FFE66D"
-                DebugLog.LogType.TOAST -> "#4ECDC4"
-                DebugLog.LogType.INTENT -> "#95E1D3"
-                DebugLog.LogType.FILE_OPEN -> "#A8E6CF"
-                DebugLog.LogType.FILE_SAVE -> "#88D8B0"
-                DebugLog.LogType.INFO -> "#AAAAAA"
-            }
-            "[${entry.timestamp}] [${entry.type.name}] ${entry.message}"
+        val builder = StringBuilder()
+
+        if (!crashLog.isNullOrEmpty()) {
+            builder.append("=== CRASH LOG ===\n")
+            builder.append(crashLog)
+            builder.append("\n\n")
         }
 
-        textLog.text = coloredLog
+        if (logs.isNotEmpty()) {
+            builder.append("=== DEBUG LOG ===\n")
+            builder.append(logs.joinToString("\n\n") { entry ->
+                val color = when (entry.type) {
+                    DebugLog.LogType.ERROR, DebugLog.LogType.CRASH -> "#FF6B6B"
+                    DebugLog.LogType.WARNING -> "#FFE66D"
+                    DebugLog.LogType.TOAST -> "#4ECDC4"
+                    DebugLog.LogType.INTENT -> "#95E1D3"
+                    DebugLog.LogType.FILE_OPEN -> "#A8E6CF"
+                    DebugLog.LogType.FILE_SAVE -> "#88D8B0"
+                    DebugLog.LogType.INFO -> "#AAAAAA"
+                }
+                "[${entry.timestamp}] [${entry.type.name}] ${entry.message}"
+            })
+        }
+
+        textLog.text = builder.toString()
     }
 }

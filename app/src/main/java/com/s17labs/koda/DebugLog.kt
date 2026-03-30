@@ -1,6 +1,9 @@
 package com.s17labs.koda
 
+import android.content.Context
 import android.util.Log
+import java.io.File
+import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -9,6 +12,11 @@ object DebugLog {
     private val logs = mutableListOf<LogEntry>()
     private val maxLogs = 100
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    private var crashFile: File? = null
+
+    fun init(context: Context) {
+        crashFile = File(context.filesDir, "crash_log.txt")
+    }
 
     data class LogEntry(
         val timestamp: String,
@@ -64,6 +72,29 @@ object DebugLog {
     fun crash(message: String, stackTrace: String? = null) {
         val fullMessage = if (stackTrace != null) "$message\n$stackTrace" else message
         addLog(LogType.CRASH, fullMessage)
+        saveCrashToFile(fullMessage)
+    }
+
+    private fun saveCrashToFile(message: String) {
+        crashFile?.let { file ->
+            try {
+                FileWriter(file, true).use { writer ->
+                    writer.write("--- ${dateFormat.format(Date())} ---\n")
+                    writer.write(message)
+                    writer.write("\n\n")
+                }
+            } catch (e: Exception) {
+                Log.e("DebugLog", "Failed to save crash to file", e)
+            }
+        }
+    }
+
+    fun getCrashLog(): String? {
+        return crashFile?.takeIf { it.exists() }?.readText()
+    }
+
+    fun clearCrashLog() {
+        crashFile?.writeText("")
     }
 
     private fun addLog(type: LogType, message: String, tag: String = "Koda") {
@@ -91,13 +122,26 @@ object DebugLog {
         synchronized(logs) {
             logs.clear()
         }
+        clearCrashLog()
     }
 
     fun exportLogs(): String {
-        return synchronized(logs) {
-            logs.joinToString("\n") { entry ->
-                "[${entry.timestamp}] [${entry.type.name}] ${entry.message}"
-            }
+        val builder = StringBuilder()
+
+        val crashLog = getCrashLog()
+        if (!crashLog.isNullOrEmpty()) {
+            builder.append("=== CRASH LOG ===\n")
+            builder.append(crashLog)
+            builder.append("\n\n")
         }
+
+        builder.append("=== DEBUG LOG ===\n")
+        synchronized(logs) {
+            builder.append(logs.joinToString("\n") { entry ->
+                "[${entry.timestamp}] [${entry.type.name}] ${entry.message}"
+            })
+        }
+
+        return builder.toString()
     }
 }

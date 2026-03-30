@@ -1,12 +1,12 @@
 package com.s17labs.koda
 
 import android.app.Application
-import android.os.Looper
 
 class KodaApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        DebugLog.init(this)
         setupGlobalExceptionHandler()
     }
 
