@@ -3,6 +3,6 @@
     android:id="@+id/customMenuContainer"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/kodaDark"
+    android:background="@color/kodaEditorBg"
     android:orientation="vertical"
     android:minWidth="200dp"/>

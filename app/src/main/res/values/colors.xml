@@ -2,25 +2,16 @@
 <resources>
     <color name="colorPrimary">#0066CC</color>
     <color name="colorPrimaryDark">#000033</color>
-    <color name="colorAccent">#0099FF</color>
+    <color name="colorAccent">#68AEFF</color>
     
-    <color name="kodaDark">#000033</color>
-    <color name="kodaDarkBlue">#000066</color>
-    <color name="kodaNavy">#0066CC</color>
+    <color name="kodaDark">#000b20</color>
+    <color name="kodaDarkBlue">#003EB7</color>
     <color name="kodaBlue">#0099FF</color>
     <color name="kodaLightBlue">#33AAFF</color>
-    <color name="kodaSurface">#000044</color>
-    <color name="kodaSurfaceLight">#003366</color>
     <color name="kodaEditorBg">#000014</color>
     <color name="kodaText">#EDEDED</color>
     <color name="kodaTextSecondary">#AAAAAA</color>
     <color name="kodaTabActive">#000014</color>
-    <color name="kodaTabInactive">#000050</color>
-    <color name="kodaDivider">#004488</color>
+    <color name="kodaTabInactive">#002060</color>
     
-    <color name="editorBackground">#000033</color>
-    <color name="editorText">#EDEDED</color>
-    <color name="editorLineNumber">#0066CC</color>
-    <color name="editorSelection">#0099FF</color>
-    <color name="editorCursor">#0099FF</color>
 </resources>

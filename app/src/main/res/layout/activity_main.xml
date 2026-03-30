@@ -73,7 +73,7 @@
         android:hint="@string/start_typing"
         android:inputType="textMultiLine|textNoSuggestions"
         android:padding="16dp"
-        android:textColor="@color/editorText"
+        android:textColor="@color/kodaText"
         android:textColorHint="@color/kodaTextSecondary"
         android:textSize="14sp"
         android:typeface="monospace" />
