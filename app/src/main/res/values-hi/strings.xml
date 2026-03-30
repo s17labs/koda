@@ -11,6 +11,11 @@
     <string name="menu_save_as">इस रूप में सहेजें</string>
     <string name="menu_settings">सेटिंग्स</string>
     <string name="menu_exit">बाहर निकलें</string>
+
+    <!-- Start Page -->
+    <string name="start_new_file">नई फ़ाइल…</string>
+    <string name="start_open_file">फ़ाइल खोलें…</string>
+    <string name="start_open_multiple">एकाधिक खोलें…</string>
     
     <!-- Settings -->
     <string name="settings_title">सेटिंग्स</string>

@@ -3,14 +3,24 @@
     
     <!-- Main -->
     <string name="start_typing">Start typing…</string>
+    <string name="empty_state_message">To get started, tap the menu icon in the top right corner</string>
+    <string name="app_slogan">Editing made easy</string>
+    <string name="start">Start</string>
     
     <!-- Menu -->
     <string name="menu_new">New</string>
     <string name="menu_open">Open</string>
+    <string name="menu_open_multiple">Open Multiple</string>
     <string name="menu_save">Save</string>
     <string name="menu_save_as">Save As</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_exit">Exit</string>
+    <string name="menu_open_last">Open Last…</string>
+
+    <!-- Start Page -->
+    <string name="start_new_file">New File…</string>
+    <string name="start_open_file">Open File…</string>
+    <string name="start_open_multiple">Open Multiple…</string>
     
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -18,8 +28,12 @@
     <string name="settings_appearance">Appearance</string>
     <string name="settings_about">About</string>
     
+    <string name="setting_open_new">Open New File</string>
+    <string name="setting_open_new_desc">Opens new empty file when app opens</string>
+    <string name="setting_open_new_desc_both">Opens new empty file (active) and last file in separate tab</string>
     <string name="setting_open_last">Open Last</string>
     <string name="setting_open_last_desc">Opens last edited file when app opens</string>
+    <string name="setting_open_last_desc_both">Opens new empty file (active) and last file in separate tab</string>
     <string name="setting_auto_save">Auto Save</string>
     <string name="setting_auto_save_desc">Automatically save currently editing file when window is closed</string>
     <string name="setting_wrap_lines">Wrap Lines</string>

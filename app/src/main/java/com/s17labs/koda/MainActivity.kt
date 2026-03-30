@@ -26,8 +26,12 @@ import java.util.Locale
 class MainActivity : AppCompatActivity() {
 
     private lateinit var textEditor: EditText
+    private lateinit var editorContainer: LinearLayout
+    private lateinit var textEmptyState: TextView
+    private lateinit var startPage: View
     private lateinit var tabContainer: LinearLayout
     private lateinit var tabScrollView: HorizontalScrollView
+    private lateinit var toolbarTitle: TextView
     private lateinit var prefs: android.content.SharedPreferences
 
     private val openFiles = mutableListOf<OpenFile>()
@@ -60,24 +64,58 @@ class MainActivity : AppCompatActivity() {
             }
         } else if (intent?.action != null) {
             DebugLog.w("Intent received but no data: action=${intent?.action}")
+            updateTabBarVisibility()
         }
         
-        if (!openedFromIntent && prefs.getBoolean("open_last", false)) {
-            val lastFileData = prefs.getString("last_file", null)
-            if (lastFileData != null) {
-                val lastFile = OpenFile.fromJson(lastFileData)
-                if (lastFile != null) {
-                    openFiles.add(lastFile)
-                    addTab(lastFile)
-                    switchToFile(lastFile)
-                    return
+        val openLastEnabled = prefs.getBoolean("open_last", false)
+        val openNewEnabled = prefs.getBoolean("open_new", true)
+        DebugLog.i("onCreate: openLastEnabled=$openLastEnabled, openNewEnabled=$openNewEnabled, openedFromIntent=$openedFromIntent")
+
+        if (!openedFromIntent) {
+            var newFile: OpenFile? = null
+
+            if (openNewEnabled) {
+                newFile = OpenFile()
+                openFiles.add(newFile)
+                addTab(newFile)
+            }
+
+            if (openLastEnabled) {
+                val lastFileData = prefs.getString("last_file", null)
+                DebugLog.i("Auto open last, data: ${lastFileData?.take(50)}")
+                if (lastFileData != null) {
+                    val lastFile = OpenFile.fromJson(lastFileData)
+                    DebugLog.i("Auto parsed lastFile: name=${lastFile?.name}, contentLength=${lastFile?.content?.length}")
+                    if (lastFile != null) {
+                        openFiles.add(lastFile)
+                        addTab(lastFile)
+                        if (!openNewEnabled) {
+                            currentFile = lastFile
+                            textEditor.setText(lastFile.content)
+                            DebugLog.i("Set editor text, length=${lastFile.content.length}")
+                        }
+                    } else {
+                        DebugLog.i("lastFile was null after parsing")
+                    }
+                } else {
+                    DebugLog.i("lastFileData was null")
                 }
             }
+
+            if (openNewEnabled && newFile != null) {
+                switchToFile(newFile)
+                DebugLog.i("switchToFile newFile")
+            }
+
+            if (openNewEnabled || openLastEnabled) {
+                updateTabBarVisibility()
+                showStartPage()
+                return
+            }
         }
-        
-        if (!openedFromIntent) {
-            newFile()
-        }
+
+        updateTabBarVisibility()
+        showStartPage()
     }
 
     override fun onResume() {
@@ -92,6 +130,7 @@ class MainActivity : AppCompatActivity() {
         
         applySettings()
         applyEditorSettings()
+        showStartPage()
     }
 
     override fun onNewIntent(intent: android.content.Intent) {
@@ -158,7 +197,10 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         if (prefs.getBoolean("auto_save", false)) {
-            currentFile?.let { saveCurrentFile(true) }
+            currentFile?.let { file ->
+                file.content = textEditor.text.toString()
+                saveCurrentFile(true)
+            }
         }
     }
 
@@ -170,7 +212,8 @@ class MainActivity : AppCompatActivity() {
     private fun saveLastFile() {
         currentFile?.let { file ->
             if (!file.isNew && file.path != null) {
-                prefs.edit().putString("last_file", file.toJson()).apply()
+                file.content = textEditor.text.toString()
+                prefs.edit().putString("last_file", file.toJson()).commit()
             }
         }
     }
@@ -212,10 +255,57 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupViews() {
         textEditor = findViewById(R.id.textEditor)
+        editorContainer = findViewById(R.id.editorContainer)
+        textEmptyState = findViewById(R.id.textEmptyState)
+        startPage = findViewById(R.id.startPage)
         tabContainer = findViewById(R.id.tabContainer)
         tabScrollView = findViewById(R.id.tabScrollView)
+        toolbarTitle = findViewById(R.id.toolbarTitle)
         
+        setupStartPage()
         applyEditorSettings()
+    }
+
+    private fun setupStartPage() {
+        startPage.findViewById<LinearLayout>(R.id.btnNewFile).setOnClickListener {
+            hideStartPage()
+            newFile()
+            updateTabBarVisibility()
+        }
+        
+        startPage.findViewById<LinearLayout>(R.id.btnOpenFile).setOnClickListener {
+            hideStartPage()
+            openFile()
+        }
+        
+        startPage.findViewById<LinearLayout>(R.id.btnOpenMultiple).setOnClickListener {
+            hideStartPage()
+            openMultipleFiles()
+        }
+        
+        startPage.findViewById<LinearLayout>(R.id.btnOpenLast).setOnClickListener {
+            if (!prefs.getBoolean("open_last", false)) {
+                return@setOnClickListener
+            }
+            val lastFileData = prefs.getString("last_file", null)
+            DebugLog.i("Open Last clicked, data: ${lastFileData?.take(50)}")
+            if (lastFileData != null) {
+                val lastFile = OpenFile.fromJson(lastFileData)
+                DebugLog.i("Parsed lastFile: name=${lastFile?.name}, contentLength=${lastFile?.content?.length}")
+                if (lastFile != null) {
+                    hideStartPage()
+                    openFiles.add(lastFile)
+                    addTab(lastFile)
+                    switchToFile(lastFile)
+                    updateTabBarVisibility()
+                }
+            }
+        }
+    }
+
+    private fun hideStartPage() {
+        startPage.visibility = View.GONE
+        toolbarTitle.visibility = View.VISIBLE
     }
 
     private fun setupEditor() {
@@ -241,8 +331,18 @@ class MainActivity : AppCompatActivity() {
         val container = popupView.findViewById<LinearLayout>(R.id.customMenuContainer)
 
         val menuItems = listOf(
-            KodaMenuItem(1, getString(R.string.menu_new), R.drawable.ic_menu_new) { newFile() },
-            KodaMenuItem(2, getString(R.string.menu_open), R.drawable.ic_menu_folder) { openFile() },
+            KodaMenuItem(1, getString(R.string.menu_new), R.drawable.ic_menu_new) { 
+                hideStartPage()
+                newFile() 
+            },
+            KodaMenuItem(2, getString(R.string.menu_open), R.drawable.ic_menu_folder) { 
+                hideStartPage()
+                openFile() 
+            },
+            KodaMenuItem(7, getString(R.string.menu_open_multiple), R.drawable.ic_menu_folder) { 
+                hideStartPage()
+                openMultipleFiles() 
+            },
             KodaMenuItem(3, getString(R.string.menu_save), R.drawable.ic_menu_save) { saveCurrentFile() },
             KodaMenuItem(4, getString(R.string.menu_save_as), R.drawable.ic_menu_save_as) { saveFileAs() },
             KodaMenuItem(5, getString(R.string.menu_settings), R.drawable.ic_menu_settings) { startActivity(Intent(this, SettingsActivity::class.java)) },
@@ -293,6 +393,15 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(intent, REQUEST_OPEN_FILE)
     }
 
+    private fun openMultipleFiles() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        }
+        startActivityForResult(intent, REQUEST_OPEN_MULTIPLE_FILES)
+    }
+
     private fun openFileFromUri(uri: Uri) {
         val existing = openFiles.find { it.path == uri.toString() }
         if (existing != null) {
@@ -321,6 +430,10 @@ class MainActivity : AppCompatActivity() {
                             untitledFile.isModified = false
                             switchToFile(untitledFile)
                             updateTabTitle(untitledFile)
+                            prefs.edit().putString("last_file", untitledFile.toJson()).apply()
+                            if (prefs.getBoolean("open_last", false)) {
+                                startPage.findViewById<LinearLayout>(R.id.btnOpenLast).visibility = View.VISIBLE
+                            }
                         }
                     }
                 }
@@ -353,6 +466,10 @@ class MainActivity : AppCompatActivity() {
                         openFiles.add(openFile)
                         switchToFile(openFile)
                         addTab(openFile)
+                        prefs.edit().putString("last_file", openFile.toJson()).apply()
+                        if (prefs.getBoolean("open_last", false)) {
+                            startPage.findViewById<LinearLayout>(R.id.btnOpenLast).visibility = View.VISIBLE
+                        }
                         DebugLog.fileOpen(uri.toString(), name)
                     }
                 }
@@ -467,6 +584,7 @@ class MainActivity : AppCompatActivity() {
         tabContainer.addView(tab)
         
         switchToFile(file)
+        updateTabBarVisibility()
         
         tabScrollView.post {
             tabScrollView.fullScroll(View.FOCUS_RIGHT)
@@ -514,9 +632,14 @@ class MainActivity : AppCompatActivity() {
         tabIndex?.let { tabContainer.removeViewAt(it) }
         
         when {
-            openFiles.isEmpty() -> newFile()
+            openFiles.isEmpty() -> {
+                currentFile = null
+                textEditor.setText("")
+            }
             currentFile == file -> switchToFile(openFiles[minOf(index, openFiles.size - 1)])
         }
+        updateTabBarVisibility()
+        showStartPage()
     }
 
     private fun updateTabTitle(file: OpenFile) {
@@ -528,6 +651,29 @@ class MainActivity : AppCompatActivity() {
                 break
             }
         }
+    }
+
+    private fun updateTabBarVisibility() {
+        val hasFiles = openFiles.isNotEmpty()
+        tabScrollView.visibility = if (hasFiles) View.VISIBLE else View.GONE
+        editorContainer.visibility = if (hasFiles) View.VISIBLE else View.GONE
+        textEmptyState.visibility = if (hasFiles) View.GONE else View.VISIBLE
+    }
+
+    private fun showStartPage() {
+        if (openFiles.isNotEmpty()) {
+            startPage.visibility = View.GONE
+            toolbarTitle.visibility = View.VISIBLE
+            return
+        }
+        val openLast = prefs.getBoolean("open_last", false)
+        val hasLastFile = prefs.getString("last_file", null) != null
+
+        startPage.visibility = View.VISIBLE
+        textEmptyState.visibility = View.GONE
+        toolbarTitle.visibility = View.GONE
+
+        startPage.findViewById<LinearLayout>(R.id.btnOpenLast).visibility = if (openLast && hasLastFile) View.VISIBLE else View.GONE
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -576,6 +722,21 @@ class MainActivity : AppCompatActivity() {
                 openFileFromUri(uri)
             }
         }
+        if (requestCode == REQUEST_OPEN_MULTIPLE_FILES && resultCode == RESULT_OK) {
+            hideStartPage()
+            val clipData = data?.clipData
+            if (clipData != null) {
+                for (i in 0 until clipData.itemCount) {
+                    val uri = clipData.getItemAt(i).uri
+                    openFileFromUri(uri)
+                }
+            } else {
+                data?.data?.let { uri ->
+                    openFileFromUri(uri)
+                }
+            }
+            updateTabBarVisibility()
+        }
     }
 
     private fun handleExit() {
@@ -608,5 +769,6 @@ class MainActivity : AppCompatActivity() {
         private const val REQUEST_SAVE_FILE = 100
         private const val REQUEST_SAVE_FILE_TAB = 103
         private const val REQUEST_OPEN_FILE = 102
+        private const val REQUEST_OPEN_MULTIPLE_FILES = 104
     }
 }

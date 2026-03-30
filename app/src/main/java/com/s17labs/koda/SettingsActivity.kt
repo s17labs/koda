@@ -23,6 +23,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var prefs: SharedPreferences
 
+    private lateinit var switchOpenNew: CustomToggleView
     private lateinit var switchOpenLast: CustomToggleView
     private lateinit var switchAutoSave: CustomToggleView
     private lateinit var switchWrapLines: CustomToggleView
@@ -32,6 +33,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var textFontValue: TextView
     private lateinit var textFontSizeValue: TextView
     private lateinit var textVersion: TextView
+    private lateinit var textOpenNewDesc: TextView
+    private lateinit var textOpenLastDesc: TextView
 
     private val languages = listOf("English", "Spanish", "Chinese", "Hindi")
     private val fonts = listOf("Monospace", "Serif", "Sans Serif")
@@ -68,6 +71,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
+        switchOpenNew = findViewById(R.id.switchOpenNew)
         switchOpenLast = findViewById(R.id.switchOpenLast)
         switchAutoSave = findViewById(R.id.switchAutoSave)
         switchWrapLines = findViewById(R.id.switchWrapLines)
@@ -77,6 +81,8 @@ class SettingsActivity : AppCompatActivity() {
         textFontValue = findViewById(R.id.textFontValue)
         textFontSizeValue = findViewById(R.id.textFontSizeValue)
         textVersion = findViewById(R.id.textVersion)
+        textOpenNewDesc = findViewById(R.id.textOpenNewDesc)
+        textOpenLastDesc = findViewById(R.id.textOpenLastDesc)
 
         findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             finish()
@@ -85,8 +91,38 @@ class SettingsActivity : AppCompatActivity() {
         val versionName = BuildConfig.VERSION_NAME
         textVersion.text = "v$versionName"
 
+        switchOpenNew.setOnCheckedChangeListener { isChecked ->
+            prefs.edit().putBoolean("open_new", isChecked).apply()
+            val bothEnabled = isChecked && switchOpenLast.isChecked
+            textOpenNewDesc.text = if (bothEnabled) {
+                getString(R.string.setting_open_new_desc_both)
+            } else {
+                getString(R.string.setting_open_new_desc)
+            }
+            textOpenLastDesc.text = if (bothEnabled) {
+                getString(R.string.setting_open_last_desc_both)
+            } else {
+                getString(R.string.setting_open_last_desc)
+            }
+        }
+
         switchOpenLast.setOnCheckedChangeListener { isChecked ->
-            prefs.edit().putBoolean("open_last", isChecked).apply()
+            if (isChecked) {
+                prefs.edit().putBoolean("open_last", true).apply()
+            } else {
+                prefs.edit().putBoolean("open_last", false).remove("last_file").apply()
+            }
+            val bothEnabled = switchOpenNew.isChecked && isChecked
+            textOpenNewDesc.text = if (bothEnabled) {
+                getString(R.string.setting_open_new_desc_both)
+            } else {
+                getString(R.string.setting_open_new_desc)
+            }
+            textOpenLastDesc.text = if (bothEnabled) {
+                getString(R.string.setting_open_last_desc_both)
+            } else {
+                getString(R.string.setting_open_last_desc)
+            }
         }
 
         switchAutoSave.setOnCheckedChangeListener { isChecked ->
@@ -123,6 +159,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun loadSettings() {
+        switchOpenNew.isChecked = prefs.getBoolean("open_new", true)
         switchOpenLast.isChecked = prefs.getBoolean("open_last", false)
         switchAutoSave.isChecked = prefs.getBoolean("auto_save", false)
         switchWrapLines.isChecked = prefs.getBoolean("wrap_lines", true)
@@ -141,6 +178,25 @@ class SettingsActivity : AppCompatActivity() {
 
         val fontSize = prefs.getString("font_size", "M")
         textFontSizeValue.text = fontSize
+
+        updateOpenNewDescription(switchOpenNew.isChecked, switchOpenLast.isChecked)
+        updateOpenLastDescription(switchOpenNew.isChecked, switchOpenLast.isChecked)
+    }
+
+    private fun updateOpenNewDescription(openNewEnabled: Boolean, openLastEnabled: Boolean) {
+        textOpenNewDesc.text = if (openNewEnabled && openLastEnabled) {
+            getString(R.string.setting_open_new_desc_both)
+        } else {
+            getString(R.string.setting_open_new_desc)
+        }
+    }
+
+    private fun updateOpenLastDescription(openNewEnabled: Boolean, openLastEnabled: Boolean) {
+        textOpenLastDesc.text = if (openNewEnabled && openLastEnabled) {
+            getString(R.string.setting_open_last_desc_both)
+        } else {
+            getString(R.string.setting_open_last_desc)
+        }
     }
 
     private fun showLanguageDialog() {

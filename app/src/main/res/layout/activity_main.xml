@@ -16,17 +16,28 @@
         android:background="@color/kodaDarkBlue"
         android:paddingHorizontal="8dp">
 
+        <ImageView
+            android:id="@+id/toolbarIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_launcher"
+            android:paddingStart="4dp"
+            android:contentDescription="Koda" />
+
         <TextView
             android:id="@+id/toolbarTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
+            android:layout_toEndOf="@+id/toolbarIcon"
             android:layout_centerVertical="true"
             android:text="Koda"
             android:textColor="@color/kodaText"
-            android:textSize="34sp"
+            android:textSize="32sp"
             android:textStyle="bold"
-            android:paddingStart="8dp" />
+			android:typeface="monospace"
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -63,19 +74,50 @@
 
     </HorizontalScrollView>
 
-    <EditText
-        android:id="@+id/textEditor"
+    <FrameLayout
+        android:id="@+id/contentFrame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/kodaEditorBg"
-        android:gravity="top|start"
-        android:hint="@string/start_typing"
-        android:inputType="textMultiLine|textNoSuggestions"
-        android:padding="16dp"
-        android:textColor="@color/kodaText"
-        android:textColorHint="@color/kodaTextSecondary"
-        android:textSize="14sp"
-        android:typeface="monospace" />
+        android:layout_weight="1">
+
+        <include
+            android:id="@+id/startPage"
+            layout="@layout/view_start_page"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/editorContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <EditText
+                android:id="@+id/textEditor"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/kodaEditorBg"
+                android:gravity="top|start"
+                android:hint="@string/start_typing"
+                android:inputType="textMultiLine|textNoSuggestions"
+                android:padding="16dp"
+                android:textColor="@color/kodaText"
+                android:textColorHint="@color/kodaTextSecondary"
+                android:textSize="14sp"
+                android:typeface="monospace" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/empty_state_message"
+            android:textColor="@color/kodaTabInactive"
+            android:textSize="16sp"
+            android:visibility="gone"
+            android:padding="32dp" 
+			android:typeface="monospace" />
+
+    </FrameLayout>
 
 </LinearLayout>
