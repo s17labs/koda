@@ -633,6 +633,7 @@ class MainActivity : AppCompatActivity() {
             openFiles.isEmpty() -> {
                 currentFile = null
                 textEditor.setText("")
+                hideKeyboard()
             }
             currentFile == file -> switchToFile(openFiles[minOf(index, openFiles.size - 1)])
         }
