@@ -10,9 +10,11 @@ A clean and lightweight Android text editor built with Kotlin.
 - 🌍 Multi-language support
 
 ## 🛠 Tech Stack
-- Kotlin
-- Android SDK (Target SDK: 34)
-- Gradle (KTS)
+| Aspect | Details |
+|--------|---------|
+| SDK | compileSdk 35, minSdk 26 |
+| Language | Kotlin 1.8.10 |
+| Build | Gradle 7.4.2 with Kotlin DSL |
 
 ## 🚀 Getting Started
 1. Clone the repository:
