@@ -1,5 +1,18 @@
 # Contributing to Koda
 
+## General Guidelines
+
+- **Commit Messages**: Use clear, concise commit messages that describe what changed and why. Follow the format:
+  - `feat: add new feature` for new features
+  - `fix: resolve issue with...` for bug fixes
+  - `refactor: restructure...` for code refactoring
+  - `docs: update README` for documentation changes
+  - `chore: update dependencies` for maintenance tasks
+
+- **Code Style**: Follow Kotlin conventions used in the project. Use meaningful variable and function names.
+
+- **Testing**: Test your changes thoroughly before submitting. For language additions, verify all UI elements display correctly.
+
 ## Adding New Languages
 
 To add a new language to Koda, you need to make changes in three places:
