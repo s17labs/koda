@@ -6,7 +6,9 @@ A clean and lightweight Android text editor built with Kotlin.
 - 📄 Create, open, and edit text files
 - 💾 Save and "Save As" support
 - 🗂️ Multiple tabs for working with several files
-- ⚙️ Simple settings screen
+- 📂 Open multiple files at once
+- 🎯 Start page for quick access to common actions
+- ⚙️ Customizable settings (auto-save, wrap lines, font, font size)
 - 🌍 Multi-language support
 
 ## 🛠 Tech Stack
