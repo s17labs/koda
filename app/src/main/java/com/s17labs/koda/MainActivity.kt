@@ -50,7 +50,19 @@ class MainActivity : AppCompatActivity() {
         setupTabs()
         setupMenu()
         
-        if (prefs.getBoolean("open_last", false)) {
+        val openedFromIntent = intent?.data != null
+        if (openedFromIntent) {
+            intent?.data?.let { uri ->
+                DebugLog.intent("Opening file from intent", uri.toString())
+                openFileFromUri(uri)
+            } ?: run {
+                DebugLog.w("Intent received but no data (uri is null)")
+            }
+        } else if (intent?.action != null) {
+            DebugLog.w("Intent received but no data: action=${intent?.action}")
+        }
+        
+        if (!openedFromIntent && prefs.getBoolean("open_last", false)) {
             val lastFileData = prefs.getString("last_file", null)
             if (lastFileData != null) {
                 val lastFile = OpenFile.fromJson(lastFileData)
@@ -63,7 +75,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
         
-        newFile()
+        if (!openedFromIntent) {
+            newFile()
+        }
     }
 
     override fun onResume() {
@@ -78,6 +92,16 @@ class MainActivity : AppCompatActivity() {
         
         applySettings()
         applyEditorSettings()
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        intent.data?.let { uri ->
+            DebugLog.intent("Opening file from new intent (app running)", uri.toString())
+            openFileFromUri(uri)
+        } ?: run {
+            DebugLog.w("New intent received but no data: action=${intent.action}")
+        }
     }
 
     private fun applySettings() {
@@ -279,8 +303,7 @@ class MainActivity : AppCompatActivity() {
         val untitledFile = openFiles.find { it.isNew }
         if (untitledFile != null) {
             try {
-                val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                contentResolver.takePersistableUriPermission(uri, takeFlags)
+                tryTakePersistablePermission(uri)
                 
                 val cursor = contentResolver.query(uri, null, null, null, null)
                 cursor?.use {
@@ -302,14 +325,14 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } catch (e: Exception) {
+                DebugLog.e("Error opening file", e)
                 Toast.makeText(this, "Error opening file: ${e.message}", Toast.LENGTH_SHORT).show()
             }
             return
         }
-        
+            
         try {
-            val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            contentResolver.takePersistableUriPermission(uri, takeFlags)
+            tryTakePersistablePermission(uri)
             
             val cursor = contentResolver.query(uri, null, null, null, null)
             cursor?.use {
@@ -330,11 +353,22 @@ class MainActivity : AppCompatActivity() {
                         openFiles.add(openFile)
                         switchToFile(openFile)
                         addTab(openFile)
+                        DebugLog.fileOpen(uri.toString(), name)
                     }
                 }
             }
         } catch (e: Exception) {
+            DebugLog.e("Error opening file", e)
             Toast.makeText(this, "Error opening file: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    private fun tryTakePersistablePermission(uri: Uri) {
+        try {
+            val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            contentResolver.takePersistableUriPermission(uri, takeFlags)
+        } catch (e: SecurityException) {
+            DebugLog.w("Could not take persistable permission (may not be granted)")
         }
     }
 
@@ -346,12 +380,16 @@ class MainActivity : AppCompatActivity() {
             return
         }
         
+        if (isAutoSave && !file.isModified) {
+            return
+        }
+        
         if (file.isNew || file.path == null) {
             if (!isAutoSave) {
                 saveFileAs()
             }
         } else {
-            writeToFile(file)
+            writeToFile(file, true)
         }
     }
 
@@ -371,7 +409,7 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(intent, REQUEST_SAVE_FILE)
     }
 
-    private fun writeToFile(openFile: OpenFile) {
+    private fun writeToFile(openFile: OpenFile, showToast: Boolean = true) {
         try {
             val path = openFile.path ?: return
             
@@ -387,8 +425,12 @@ class MainActivity : AppCompatActivity() {
             openFile.isNew = false
             openFile.originalContent = openFile.content
             updateTabTitle(openFile)
-            Toast.makeText(this, R.string.file_saved, Toast.LENGTH_SHORT).show()
+            DebugLog.fileSave(openFile.name, path)
+            if (showToast) {
+                Toast.makeText(this, R.string.file_saved, Toast.LENGTH_SHORT).show()
+            }
         } catch (e: Exception) {
+            DebugLog.e("Error saving file", e)
             Toast.makeText(this, getString(R.string.error_saving, e.message), Toast.LENGTH_SHORT).show()
         }
     }
@@ -503,6 +545,7 @@ class MainActivity : AppCompatActivity() {
                         updateTabTitle(file)
                         Toast.makeText(this, R.string.file_saved, Toast.LENGTH_SHORT).show()
                     } catch (e: Exception) {
+                        DebugLog.e("Error saving file (tab)", e)
                         Toast.makeText(this, getString(R.string.error_saving, e.message), Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -521,6 +564,7 @@ class MainActivity : AppCompatActivity() {
                         updateTabTitle(file)
                         Toast.makeText(this, R.string.file_saved, Toast.LENGTH_SHORT).show()
                     } catch (e: Exception) {
+                        DebugLog.e("Error saving file (tab save as)", e)
                         Toast.makeText(this, getString(R.string.error_saving, e.message), Toast.LENGTH_SHORT).show()
                     }
                 }

@@ -11,6 +11,7 @@ import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -77,6 +78,10 @@ class SettingsActivity : AppCompatActivity() {
         textFontSizeValue = findViewById(R.id.textFontSizeValue)
         textVersion = findViewById(R.id.textVersion)
 
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
+            finish()
+        }
+
         val versionName = BuildConfig.VERSION_NAME
         textVersion.text = "v$versionName"
 
@@ -110,6 +115,10 @@ class SettingsActivity : AppCompatActivity() {
 
         findViewById<LinearLayout>(R.id.settingAbout).setOnClickListener {
             showAboutDialog()
+        }
+
+        findViewById<LinearLayout>(R.id.settingDebugLog).setOnClickListener {
+            startActivity(Intent(this, DebugLogActivity::class.java))
         }
     }
 

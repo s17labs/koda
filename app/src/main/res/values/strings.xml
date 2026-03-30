@@ -57,4 +57,16 @@
     <string name="error_opening">Error opening file: %1$s</string>
     <string name="settings_coming_soon">Settings coming soon</string>
     <string name="language_changed">Language changed to %1$s</string>
+    
+    <!-- Debug Log -->
+    <string name="debug_log">Debug Log</string>
+    <string name="debug_log_desc">View and Export debug logs</string>
+    <string name="clear">Clear</string>
+    <string name="copy">Copy</string>
+    <string name="export">Export</string>
+    <string name="logs_cleared">Logs cleared</string>
+    <string name="logs_copied">Logs copied to clipboard</string>
+    <string name="logs_exported">Logs exported successfully</string>
+    <string name="export_failed">Failed to export logs</string>
+    <string name="no_logs">No logs yet</string>
 </resources>
