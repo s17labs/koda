@@ -1,0 +1,86 @@
+<resources>
+    <string name="app_name">Koda</string>
+    
+    <!-- Main -->
+    <string name="start_typing">Začnite písať…</string>
+    <string name="empty_state_message">Pre začiatok, klepnite na ikonu ponuky v pravom hornom rohu</string>
+    <string name="app_slogan">Jednoduché úpravy</string>
+    <string name="start">Štart</string>
+    
+    <!-- Menu -->
+    <string name="menu_new">Nový</string>
+    <string name="menu_open">Otvoriť</string>
+    <string name="menu_open_multiple">Otvoriť viacero</string>
+    <string name="menu_save">Uložiť</string>
+    <string name="menu_save_as">Uložiť ako</string>
+    <string name="menu_settings">Nastavenia</string>
+    <string name="menu_exit">Zavrieť</string>
+    <string name="menu_open_last">Otvoriť posledný…</string>
+
+    <!-- Start Page -->
+    <string name="start_new_file">Nový súbor…</string>
+    <string name="start_open_file">Otvoriť súbor…</string>
+    <string name="start_open_multiple">Otvoriť viacero…</string>
+    
+    <!-- Settings -->
+    <string name="settings_title">Nastavenia</string>
+    <string name="settings_main">Hlavné nastavenia</string>
+    <string name="settings_appearance">Vzhľad</string>
+    <string name="settings_about">O aplikácii</string>
+    
+    <string name="setting_open_new">Otvoriť nový súbor</string>
+    <string name="setting_open_new_desc">Otvorí nový prázdny súbor pri spustení aplikácie</string>
+    <string name="setting_open_new_desc_both">Otvorí nový prázdny súbor (aktívny) a posledný súbor v samostatnej karte</string>
+    <string name="setting_open_last">Otvoriť posledný</string>
+    <string name="setting_open_last_desc">Otvorí posledný upravovaný súbor pri spustení aplikácie</string>
+    <string name="setting_open_last_desc_both">Otvorí nový prázdny súbor (aktívny) a posledný súbor v samostatnej karte</string>
+    <string name="setting_auto_save">Automatické ukladanie</string>
+    <string name="setting_auto_save_desc">Automaticky uloží aktuálne upravovaný súbor pri zatvorení okna</string>
+    <string name="setting_wrap_lines">Zalamovať riadky</string>
+    <string name="setting_wrap_lines_desc">Zalamovať riadok ak je text príliš dlhý</string>
+    <string name="setting_wake_lock">Použiť WakeLock</string>
+    <string name="setting_wake_lock_desc">Zabrániť zariadeniu ísť do spiaceho režimu</string>
+    
+    <string name="setting_language">Jazyk</string>
+    <string name="setting_font">Písmo</string>
+    <string name="setting_font_size">Veľkosť písma</string>
+    <string name="choose_language">Vyberte jazyk</string>
+    <string name="choose_font">Vyberte typ písma</string>
+    <string name="choose_font_size">Vyberte veľkosť písma</string>
+    
+    <string name="version">Verzia</string>
+    <string name="about_koda">O Koda</string>
+    <string name="about_koda_desc">Len tak pre info</string>
+    <string name="about_content">Toto je čistý a jednoduchý textový editor pre Android vytvorený v Kotline.\n\nViac info na: https://github.com/s17labs/koda</string>
+    
+    <!-- Dialogs -->
+    <string name="unsaved_changes">Neuložené zmeny</string>
+    <string name="unsaved_changes_message">Máte neuložené zmeny. Chcete uložiť pred ukončením?</string>
+    <string name="save_and_exit">Uložiť a ukončiť</string>
+    <string name="exit_without_saving">Ukončiť bez ukladania</string>
+    <string name="cancel">Zrušiť</string>
+    <string name="ok">OK</string>
+    <string name="save">Uložiť</string>
+    <string name="dont_save">Neukladať</string>
+    <string name="save_changes">Chcete uložiť zmeny do %1$s?</string>
+    
+    <!-- Messages -->
+    <string name="nothing_to_save">Nie je čo ukladať</string>
+    <string name="file_saved">Súbor uložený</string>
+    <string name="error_saving">Chyba pri ukladaní: %1$s</string>
+    <string name="error_opening">Chyba pri otváraní: %1$s</string>
+    <string name="settings_coming_soon">Nastavenia čoskoro</string>
+    <string name="language_changed">Jazyk zmenený na %1$s</string>
+    
+    <!-- Debug Log -->
+    <string name="debug_log">Debug log</string>
+    <string name="debug_log_desc">Zobraziť a exportovať debug logy</string>
+    <string name="clear">Vymazať</string>
+    <string name="copy">Kopírovať</string>
+    <string name="export">Exportovať</string>
+    <string name="logs_cleared">Logy vymazané</string>
+    <string name="logs_copied">Logy skopírované do schránky</string>
+    <string name="logs_exported">Logy úspešne exportované</string>
+    <string name="export_failed">Export logov zlyhal</string>
+    <string name="no_logs">Zatiaľ žiadne logy</string>
+</resources>

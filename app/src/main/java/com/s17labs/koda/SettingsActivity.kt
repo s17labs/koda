@@ -36,7 +36,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var textOpenNewDesc: TextView
     private lateinit var textOpenLastDesc: TextView
 
-    private val languages = listOf("English", "Spanish", "Chinese", "Hindi")
+    private val languages = listOf("English", "Slovak")
     private val fonts = listOf("Monospace", "Serif", "Sans Serif")
     private val fontSizes = listOf("XS", "S", "M", "ML", "L", "XL")
 
@@ -55,9 +55,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun applyLocale() {
         val language = prefs.getString("language", "English")
         val locale = when (language) {
-            "Spanish" -> Locale("es")
-            "Chinese" -> Locale("zh")
-            "Hindi" -> Locale("hi")
+            "Slovak" -> Locale("sk")
             else -> Locale.ENGLISH
         }
         

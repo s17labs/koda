@@ -154,9 +154,7 @@ class MainActivity : AppCompatActivity() {
     private fun applyLocale() {
         val language = prefs.getString("language", "English")
         val locale = when (language) {
-            "Spanish" -> Locale("es")
-            "Chinese" -> Locale("zh")
-            "Hindi" -> Locale("hi")
+            "Slovak" -> Locale("sk")
             else -> Locale.ENGLISH
         }
         
