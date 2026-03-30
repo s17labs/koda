@@ -217,9 +217,9 @@ class MainActivity : AppCompatActivity() {
         val container = popupView.findViewById<LinearLayout>(R.id.customMenuContainer)
 
         val menuItems = listOf(
-            KodaMenuItem(1, getString(R.string.menu_new), R.drawable.ic_new) { newFile() },
+            KodaMenuItem(1, getString(R.string.menu_new), R.drawable.ic_menu_new) { newFile() },
             KodaMenuItem(2, getString(R.string.menu_open), R.drawable.ic_menu_folder) { openFile() },
-            KodaMenuItem(3, getString(R.string.menu_save), R.drawable.ic_save) { saveCurrentFile() },
+            KodaMenuItem(3, getString(R.string.menu_save), R.drawable.ic_menu_save) { saveCurrentFile() },
             KodaMenuItem(4, getString(R.string.menu_save_as), R.drawable.ic_menu_save_as) { saveFileAs() },
             KodaMenuItem(5, getString(R.string.menu_settings), R.drawable.ic_menu_settings) { startActivity(Intent(this, SettingsActivity::class.java)) },
             KodaMenuItem(6, getString(R.string.menu_exit), R.drawable.ic_menu_exit) { handleExit() }
