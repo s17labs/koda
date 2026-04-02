@@ -1,4 +1,4 @@
-# <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" width="38" align="left" />Koda
+# Koda
 
 A clean and lightweight Android text editor built with Kotlin.
 
