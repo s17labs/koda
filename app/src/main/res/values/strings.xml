@@ -64,6 +64,12 @@
     <string name="dont_save">Don\'t Save</string>
     <string name="save_changes">Do you want to save changes to %1$s?</string>
     
+    <!-- File Save Dialog -->
+    <string name="enter_file_name">Enter File Name</string>
+    <string name="file_name_hint">File name</string>
+    <string name="select_save_location">Select save location</string>
+    <string name="save_location_required">Please select a save location</string>
+
     <!-- Messages -->
     <string name="nothing_to_save">Nothing to save</string>
     <string name="file_saved">File saved</string>

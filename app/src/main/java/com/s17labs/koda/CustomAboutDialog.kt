@@ -10,8 +10,10 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.view.Gravity
 import android.view.View
 import android.view.Window
+import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.TextView
 
@@ -29,9 +31,11 @@ class CustomAboutDialog(private val context: Context) {
         dialog.setContentView(R.layout.dialog_about)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.window?.setLayout(
-            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
         )
+        dialog.window?.setGravity(Gravity.CENTER)
+        dialog.window?.setDimAmount(0.6f)
         dialog.setCanceledOnTouchOutside(true)
         dialog.show()
 

@@ -4,7 +4,9 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.view.Gravity
 import android.view.Window
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.RadioButton
@@ -45,9 +47,11 @@ class CustomOptionDialog(context: Context) {
         dialog.setContentView(R.layout.dialog_option)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.window?.setLayout(
-            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
         )
+        dialog.window?.setGravity(Gravity.CENTER)
+        dialog.window?.setDimAmount(0.6f)
         dialog.setCanceledOnTouchOutside(true)
         dialog.show()
 
@@ -65,7 +69,7 @@ class CustomOptionDialog(context: Context) {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
-                setPadding(16, 32, 16, 32)
+                setPadding(8, 24, 8, 24)
                 if (index == defaultIndex) {
                     isChecked = true
                 }

@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.documentfile.provider.DocumentFile
 import com.s17labs.koda.model.KodaMenuItem
 import com.s17labs.koda.model.OpenFile
 import java.io.File
@@ -197,8 +198,8 @@ class MainActivity : AppCompatActivity() {
         if (prefs.getBoolean("auto_save", false)) {
             currentFile?.let { file ->
                 file.content = textEditor.text.toString()
-                saveCurrentFile(true)
             }
+            saveAllModifiedFiles()
         }
     }
 
@@ -212,6 +213,14 @@ class MainActivity : AppCompatActivity() {
             if (!file.isNew && file.path != null) {
                 file.content = textEditor.text.toString()
                 prefs.edit().putString("last_file", file.toJson()).commit()
+            }
+        }
+    }
+
+    private fun saveAllModifiedFiles() {
+        for (file in openFiles) {
+            if (file.isModified && file.content.isNotEmpty() && !file.isNew && file.path != null) {
+                writeToFile(file, false)
             }
         }
     }
@@ -501,7 +510,7 @@ class MainActivity : AppCompatActivity() {
         
         if (file.isNew || file.path == null) {
             if (!isAutoSave) {
-                saveFileAs()
+                showSaveAsDialog()
             }
         } else {
             writeToFile(file, true)
@@ -516,12 +525,98 @@ class MainActivity : AppCompatActivity() {
             return
         }
         
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "*/*"
-            putExtra(Intent.EXTRA_TITLE, file.name)
+        showSaveAsDialog()
+    }
+
+    private fun showSaveAsDialog() {
+        val file = currentFile ?: return
+        
+        CustomTextInputDialog(this)
+            .setTitle(getString(R.string.enter_file_name))
+            .setHint(getString(R.string.file_name_hint))
+            .setDefaultText(file.name)
+            .setOnOkClickListener { fileName ->
+                pendingFileName = fileName
+                openDirectoryPicker()
+            }
+            .setOnCancelClickListener { }
+            .show()
+    }
+
+    private fun openDirectoryPicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
         }
-        startActivityForResult(intent, REQUEST_SAVE_FILE)
+        startActivityForResult(intent, REQUEST_SAVE_DIRECTORY)
+    }
+
+    private fun saveToSelectedDirectory(directoryUri: Uri) {
+        val file = pendingFileForSave ?: currentFile ?: return
+        val fileName = pendingFileName
+        
+        if (fileName.isEmpty()) {
+            Toast.makeText(this, R.string.save_location_required, Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        try {
+            val directory = DocumentFile.fromTreeUri(this, directoryUri)
+            if (directory == null || !directory.isDirectory) {
+                Toast.makeText(this, R.string.save_location_required, Toast.LENGTH_SHORT).show()
+                return
+            }
+            
+            val mimeType = getMimeType(fileName)
+            val existingFile = directory.findFile(fileName)
+            existingFile?.delete()
+            
+            val newFile = directory.createFile(mimeType, fileName)
+            if (newFile != null) {
+                contentResolver.openOutputStream(newFile.uri)?.use { output ->
+                    output.write(file.content.toByteArray())
+                }
+                file.name = fileName
+                file.path = newFile.uri.toString()
+                file.isModified = false
+                file.isNew = false
+                file.originalContent = file.content
+                updateTabTitle(file)
+                DebugLog.fileSave(fileName, newFile.uri.toString())
+                Toast.makeText(this, R.string.file_saved, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, getString(R.string.error_saving, "Could not create file"), Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            DebugLog.e("Error saving file", e)
+            Toast.makeText(this, getString(R.string.error_saving, e.message), Toast.LENGTH_SHORT).show()
+        }
+        
+        pendingFileName = ""
+        pendingFileForSave = null
+    }
+
+    private fun getMimeType(fileName: String): String {
+        val extension = fileName.substringAfterLast('.', "")
+        return when (extension.lowercase()) {
+            "txt" -> "text/plain"
+            "html", "htm" -> "text/html"
+            "xml" -> "application/xml"
+            "json" -> "application/json"
+            "md" -> "text/markdown"
+            "css" -> "text/css"
+            "js" -> "application/javascript"
+            "java" -> "text/x-java-source"
+            "kt" -> "text/x-kotlin"
+            "py" -> "text/x-python"
+            "c" -> "text/x-c"
+            "cpp" -> "text/x-c++"
+            "h" -> "text/x-chdr"
+            "sh" -> "application/x-sh"
+            "csv" -> "text/csv"
+            "log" -> "text/plain"
+            else -> "application/octet-stream"
+        }
     }
 
     private fun writeToFile(openFile: OpenFile, showToast: Boolean = true) {
@@ -591,36 +686,44 @@ class MainActivity : AppCompatActivity() {
 
     private fun closeTab(file: OpenFile) {
         if (file.isModified) {
-            val dialog = android.app.AlertDialog.Builder(this)
-            dialog.setTitle(R.string.unsaved_changes)
-            dialog.setMessage(getString(R.string.save_changes, file.name))
-            dialog.setPositiveButton(R.string.save) { _, _ ->
-                if (file.isNew || file.path == null) {
-                    saveFileAsForTab(file)
-                } else {
-                    writeToFile(file)
+            CustomConfirmDialog(this)
+                .setTitle(getString(R.string.unsaved_changes))
+                .setMessage(getString(R.string.save_changes, file.name))
+                .setPositiveButton(getString(R.string.save)) {
+                    if (file.isNew || file.path == null) {
+                        saveFileAsForTab(file)
+                    } else {
+                        writeToFile(file)
+                    }
+                    removeTab(file)
                 }
-                removeTab(file)
-            }
-            dialog.setNegativeButton(R.string.dont_save) { _, _ -> removeTab(file) }
-            dialog.setNeutralButton(R.string.cancel, null)
-            dialog.show()
+                .setNegativeButton(getString(R.string.dont_save)) {
+                    removeTab(file)
+                }
+                .show()
         } else {
             removeTab(file)
         }
     }
 
     private fun saveFileAsForTab(file: OpenFile) {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "*/*"
-            putExtra(Intent.EXTRA_TITLE, file.name)
-        }
         pendingFileForSave = file
-        startActivityForResult(intent, REQUEST_SAVE_FILE_TAB)
+        CustomTextInputDialog(this)
+            .setTitle(getString(R.string.enter_file_name))
+            .setHint(getString(R.string.file_name_hint))
+            .setDefaultText(file.name)
+            .setOnOkClickListener { fileName ->
+                pendingFileName = fileName
+                openDirectoryPicker()
+            }
+            .setOnCancelClickListener {
+                pendingFileForSave = null
+            }
+            .show()
     }
 
     private var pendingFileForSave: OpenFile? = null
+    private var pendingFileName: String = ""
 
     private fun removeTab(file: OpenFile) {
         val index = openFiles.indexOf(file)
@@ -677,6 +780,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_SAVE_DIRECTORY && resultCode == RESULT_OK) {
+            data?.data?.let { uri ->
+                val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                contentResolver.takePersistableUriPermission(uri, takeFlags)
+                saveToSelectedDirectory(uri)
+            } ?: run {
+                pendingFileName = ""
+                pendingFileForSave = null
+            }
+        }
         if (requestCode == REQUEST_SAVE_FILE && resultCode == RESULT_OK) {
             data?.data?.let { uri ->
                 currentFile?.let { file ->
@@ -740,17 +853,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleExit() {
         if (openFiles.any { it.isModified }) {
-            android.app.AlertDialog.Builder(this)
-                .setTitle(R.string.unsaved_changes)
-                .setMessage(R.string.unsaved_changes_message)
-                .setPositiveButton(R.string.save_and_exit) { _, _ ->
+            CustomConfirmDialog(this)
+                .setTitle(getString(R.string.unsaved_changes))
+                .setMessage(getString(R.string.unsaved_changes_message))
+                .setPositiveButton(getString(R.string.save_and_exit)) {
                     saveCurrentFile()
                     finish()
                 }
-                .setNegativeButton(R.string.exit_without_saving) { _, _ ->
+                .setNegativeButton(getString(R.string.exit_without_saving)) {
                     finish()
                 }
-                .setNeutralButton(R.string.cancel, null)
                 .show()
         } else {
             finish()
@@ -765,7 +877,8 @@ class MainActivity : AppCompatActivity() {
     }
     
     companion object {
-        private const val REQUEST_SAVE_FILE = 100
+        private const val REQUEST_SAVE_DIRECTORY = 100
+        private const val REQUEST_SAVE_FILE = 101
         private const val REQUEST_SAVE_FILE_TAB = 103
         private const val REQUEST_OPEN_FILE = 102
         private const val REQUEST_OPEN_MULTIPLE_FILES = 104

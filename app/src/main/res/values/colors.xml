@@ -14,5 +14,6 @@
     <color name="kodaTabActive">#000014</color>
     <color name="kodaTabInactive">#002060</color>
     <color name="kodaDivider">#004488</color>
+    <color name="kodaDialogBg">#001533</color>
     
 </resources>
