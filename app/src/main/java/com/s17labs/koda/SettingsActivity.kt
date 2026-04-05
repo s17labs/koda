@@ -4,12 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.documentfile.provider.DocumentFile
 import java.util.Locale
 
 class SettingsActivity : AppCompatActivity() {
@@ -28,6 +31,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var textVersion: TextView
     private lateinit var textOpenNewDesc: TextView
     private lateinit var textOpenLastDesc: TextView
+    private lateinit var textSaveFolderValue: TextView
 
     private val languages = listOf("English", "Slovak")
     private val fonts = listOf("Monospace", "Serif", "Sans Serif")
@@ -43,6 +47,11 @@ class SettingsActivity : AppCompatActivity() {
 
         initViews()
         loadSettings()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadSaveFolderPath()
     }
     
     private fun applyLocale() {
@@ -74,6 +83,7 @@ class SettingsActivity : AppCompatActivity() {
         textVersion = findViewById(R.id.textVersion)
         textOpenNewDesc = findViewById(R.id.textOpenNewDesc)
         textOpenLastDesc = findViewById(R.id.textOpenLastDesc)
+        textSaveFolderValue = findViewById(R.id.textSaveFolderValue)
 
         findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             finish()
@@ -128,6 +138,10 @@ class SettingsActivity : AppCompatActivity() {
             prefs.edit().putBoolean("wake_lock", isChecked).apply()
         }
 
+        findViewById<LinearLayout>(R.id.settingSaveFolder).setOnClickListener {
+            openFolderPicker()
+        }
+
         findViewById<LinearLayout>(R.id.settingLanguage).setOnClickListener {
             showLanguageDialog()
         }
@@ -172,6 +186,54 @@ class SettingsActivity : AppCompatActivity() {
 
         updateOpenNewDescription(switchOpenNew.isChecked, switchOpenLast.isChecked)
         updateOpenLastDescription(switchOpenNew.isChecked, switchOpenLast.isChecked)
+        loadSaveFolderPath()
+    }
+
+    private fun loadSaveFolderPath() {
+        val customFolder = prefs.getString("default_save_folder_uri", null)
+        if (customFolder != null) {
+            val folderName = getFolderDisplayName(Uri.parse(customFolder))
+            textSaveFolderValue.text = folderName
+        } else {
+            textSaveFolderValue.text = getString(R.string.setting_save_folder_default)
+        }
+    }
+
+    private fun getFolderDisplayName(uri: Uri): String {
+        val encodedPath = uri.encodedPath ?: return "Custom Folder"
+        
+        val decodedPath = encodedPath
+            .substringAfter("tree/", "")
+            .replace("%3A", "/")
+            .replace("%2F", "/")
+            .replace("%20", " ")
+        
+        if (decodedPath.startsWith("primary/")) {
+            return "Internal Storage/" + decodedPath.substringAfter("primary/")
+        }
+        
+        return decodedPath
+    }
+
+    private fun openFolderPicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        }
+        startActivityForResult(intent, REQUEST_SAVE_FOLDER)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_SAVE_FOLDER && resultCode == RESULT_OK) {
+            data?.data?.let { uri ->
+                val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                contentResolver.takePersistableUriPermission(uri, takeFlags)
+                prefs.edit().putString("default_save_folder_uri", uri.toString()).apply()
+                textSaveFolderValue.text = getFolderDisplayName(uri)
+                Toast.makeText(this, R.string.setting_save_folder_changed, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun updateOpenNewDescription(openNewEnabled: Boolean, openLastEnabled: Boolean) {
@@ -253,6 +315,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val REQUEST_SAVE_FOLDER = 200
+        
         fun getPreferences(context: Context): SharedPreferences {
             return context.getSharedPreferences("koda_prefs", Context.MODE_PRIVATE)
         }

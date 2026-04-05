@@ -54,15 +54,21 @@ class CustomToggleView @JvmOverloads constructor(
     }
 
     private fun updateThumbPosition(animate: Boolean) {
-        val maxTranslation = 55f
+        post {
+            val trackWidth = track.width
+            val thumbWidth = thumb.width
+            val startMargin = (thumb.layoutParams as? MarginLayoutParams)?.marginStart ?: 0
+            val endMargin = trackWidth - thumbWidth - startMargin
+            val maxTranslation = (endMargin - startMargin).toFloat()
 
-        if (animate) {
-            thumb.animate()
-                .translationX(if (_isChecked) maxTranslation else 0f)
-                .setDuration(200)
-                .start()
-        } else {
-            thumb.translationX = if (_isChecked) maxTranslation else 0f
+            if (animate) {
+                thumb.animate()
+                    .translationX(if (_isChecked) maxTranslation else 0f)
+                    .setDuration(200)
+                    .start()
+            } else {
+                thumb.translationX = if (_isChecked) maxTranslation else 0f
+            }
         }
     }
 }

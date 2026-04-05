@@ -40,6 +40,20 @@
     <string name="setting_wrap_lines_desc">Wrap the line if text is too long</string>
     <string name="setting_wake_lock">Use WakeLock</string>
     <string name="setting_wake_lock_desc">Prevent device going to sleep mode</string>
+    <string name="setting_save_folder">Save Folder</string>
+    <string name="setting_save_folder_desc">Default folder for saving new files</string>
+    <string name="setting_save_folder_default">Click to select a default save folder</string>
+    <string name="setting_save_folder_changed">Save folder changed</string>
+    <string name="select_folder">Select Folder</string>
+    <string name="file_exists">File Exists</string>
+    <string name="file_exists_message">A file with this name already exists. Do you want to replace it?</string>
+    <string name="replace">Replace</string>
+    <string name="choose_folder">Choose Folder</string>
+    <string name="later">Later</string>
+    <string name="folder_selected">Folder selected</string>
+    <string name="folder_selected_to">Folder set: %1$s</string>
+    <string name="setup_save_folder">Set Save Folder</string>
+    <string name="setup_save_folder_message">Choose a default folder where your files will be saved. You can change this later in Settings.</string>
     
     <string name="setting_language">Language</string>
     <string name="setting_font">Font</string>

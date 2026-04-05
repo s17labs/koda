@@ -168,6 +168,45 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkDefaultSaveFolder() {
+        val hasDefaultFolder = prefs.getString("default_save_folder_uri", null) != null
+        if (!hasDefaultFolder) {
+            showFolderSetupPrompt()
+        }
+    }
+
+    private fun showFolderSetupPrompt() {
+        pendingFileForSave = currentFile
+        pendingFileName = generateNewFileName()
+        CustomConfirmDialog(this)
+            .setTitle(getString(R.string.setup_save_folder))
+            .setMessage(getString(R.string.setup_save_folder_message))
+            .setPositiveButton(getString(R.string.choose_folder)) {
+                openDefaultFolderPicker()
+            }
+            .setNegativeButton(getString(R.string.later)) {
+                pendingFileForSave = null
+                pendingFileName = ""
+            }
+            .show()
+    }
+
+    private fun openDefaultFolderPicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        }
+        startActivityForResult(intent, REQUEST_SAVE_DEFAULT_FOLDER)
+    }
+
+    private fun openDirectoryPicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        }
+        startActivityForResult(intent, REQUEST_SAVE_DIRECTORY)
+    }
+
     private fun applyEditorSettings() {
         val fontType = when (prefs.getString("font", "Monospace")) {
             "Serif" -> Typeface.SERIF
@@ -510,51 +549,57 @@ class MainActivity : AppCompatActivity() {
         
         if (file.isNew || file.path == null) {
             if (!isAutoSave) {
-                showSaveAsDialog()
+                val defaultFolderUri = prefs.getString("default_save_folder_uri", null)
+                if (defaultFolderUri != null) {
+                    pendingFileForSave = file
+                    pendingFileName = generateNewFileName()
+                    showFileNameInputForSave(Uri.parse(defaultFolderUri))
+                } else {
+                    showFolderSetupPrompt()
+                }
             }
         } else {
             writeToFile(file, true)
         }
     }
 
-    private fun saveFileAs() {
-        val file = currentFile ?: return
-        
-        if (file.content.isEmpty()) {
-            Toast.makeText(this, R.string.nothing_to_save, Toast.LENGTH_SHORT).show()
-            return
-        }
-        
-        showSaveAsDialog()
+    private fun generateNewFileName(): String {
+        val counter = prefs.getInt("new_file_counter", 1)
+        val fileName = "koda-file_$counter.txt"
+        prefs.edit().putInt("new_file_counter", counter + 1).apply()
+        return fileName
     }
 
-    private fun showSaveAsDialog() {
-        val file = currentFile ?: return
+    private fun showFileNameInputForSave(folderUri: Uri) {
+        val file = pendingFileForSave ?: return
+        
+        val defaultName = if (pendingFileName.isNotEmpty()) pendingFileName else file.name
         
         CustomTextInputDialog(this)
             .setTitle(getString(R.string.enter_file_name))
             .setHint(getString(R.string.file_name_hint))
-            .setDefaultText(file.name)
+            .setDefaultText(defaultName)
             .setOnOkClickListener { fileName ->
-                pendingFileName = fileName
-                openDirectoryPicker()
+                saveFileToDirectory(file, fileName, folderUri)
+                pendingFileName = ""
+                pendingFileForSave = null
             }
-            .setOnCancelClickListener { }
+            .setOnCancelClickListener {
+                pendingFileName = ""
+                pendingFileForSave = null
+            }
             .show()
-    }
-
-    private fun openDirectoryPicker() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-        }
-        startActivityForResult(intent, REQUEST_SAVE_DIRECTORY)
     }
 
     private fun saveToSelectedDirectory(directoryUri: Uri) {
         val file = pendingFileForSave ?: currentFile ?: return
         val fileName = pendingFileName
-        
+        saveFileToDirectory(file, fileName, directoryUri)
+        pendingFileName = ""
+        pendingFileForSave = null
+    }
+
+    private fun saveFileToDirectory(file: OpenFile, fileName: String, directoryUri: Uri) {
         if (fileName.isEmpty()) {
             Toast.makeText(this, R.string.save_location_required, Toast.LENGTH_SHORT).show()
             return
@@ -567,10 +612,33 @@ class MainActivity : AppCompatActivity() {
                 return
             }
             
-            val mimeType = getMimeType(fileName)
+            val existingFile = directory.findFile(fileName)
+            if (existingFile != null) {
+                CustomConfirmDialog(this)
+                    .setTitle(getString(R.string.file_exists, fileName))
+                    .setMessage(getString(R.string.file_exists_message))
+                    .setPositiveButton(getString(R.string.replace)) {
+                        doSaveFileToDirectory(file, fileName, directoryUri)
+                    }
+                    .setNegativeButton(getString(R.string.cancel)) { }
+                    .show()
+            } else {
+                doSaveFileToDirectory(file, fileName, directoryUri)
+            }
+        } catch (e: Exception) {
+            DebugLog.e("Error saving file", e)
+            Toast.makeText(this, getString(R.string.error_saving, e.message), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun doSaveFileToDirectory(file: OpenFile, fileName: String, directoryUri: Uri) {
+        try {
+            val directory = DocumentFile.fromTreeUri(this, directoryUri) ?: return
+            
             val existingFile = directory.findFile(fileName)
             existingFile?.delete()
             
+            val mimeType = getMimeType(fileName)
             val newFile = directory.createFile(mimeType, fileName)
             if (newFile != null) {
                 contentResolver.openOutputStream(newFile.uri)?.use { output ->
@@ -591,9 +659,6 @@ class MainActivity : AppCompatActivity() {
             DebugLog.e("Error saving file", e)
             Toast.makeText(this, getString(R.string.error_saving, e.message), Toast.LENGTH_SHORT).show()
         }
-        
-        pendingFileName = ""
-        pendingFileForSave = null
     }
 
     private fun getMimeType(fileName: String): String {
@@ -722,6 +787,29 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun saveFileAs() {
+        val file = currentFile ?: return
+        
+        if (file.content.isEmpty()) {
+            Toast.makeText(this, R.string.nothing_to_save, Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        pendingFileForSave = file
+        CustomTextInputDialog(this)
+            .setTitle(getString(R.string.enter_file_name))
+            .setHint(getString(R.string.file_name_hint))
+            .setDefaultText(file.name)
+            .setOnOkClickListener { fileName ->
+                pendingFileName = fileName
+                openDirectoryPicker()
+            }
+            .setOnCancelClickListener {
+                pendingFileForSave = null
+            }
+            .show()
+    }
+
     private var pendingFileForSave: OpenFile? = null
     private var pendingFileName: String = ""
 
@@ -789,6 +877,27 @@ class MainActivity : AppCompatActivity() {
                 pendingFileName = ""
                 pendingFileForSave = null
             }
+        }
+        if (requestCode == REQUEST_SAVE_DEFAULT_FOLDER && resultCode == RESULT_OK) {
+            data?.data?.let { uri ->
+                val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                try {
+                    contentResolver.takePersistableUriPermission(uri, takeFlags)
+                } catch (e: Exception) {
+                    DebugLog.w("Could not take persistable permission")
+                }
+                prefs.edit().putString("default_save_folder_uri", uri.toString()).apply()
+                
+                if (pendingFileForSave != null) {
+                    showFileNameInputForSave(uri)
+                } else {
+                    val folderName = formatFolderPath(uri)
+                    Toast.makeText(this, getString(R.string.folder_selected_to, folderName), Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else if (requestCode == REQUEST_SAVE_DEFAULT_FOLDER && resultCode == RESULT_CANCELED) {
+            pendingFileName = ""
+            pendingFileForSave = null
         }
         if (requestCode == REQUEST_SAVE_FILE && resultCode == RESULT_OK) {
             data?.data?.let { uri ->
@@ -875,6 +984,22 @@ class MainActivity : AppCompatActivity() {
             imm.hideSoftInputFromWindow(it.windowToken, 0)
         }
     }
+
+    private fun formatFolderPath(uri: Uri): String {
+        val encodedPath = uri.encodedPath ?: return "Custom Folder"
+        
+        val decodedPath = encodedPath
+            .substringAfter("tree/", "")
+            .replace("%3A", "/")
+            .replace("%2F", "/")
+            .replace("%20", " ")
+        
+        return if (decodedPath.startsWith("primary/")) {
+            "Internal Storage/" + decodedPath.substringAfter("primary/")
+        } else {
+            decodedPath
+        }
+    }
     
     companion object {
         private const val REQUEST_SAVE_DIRECTORY = 100
@@ -882,5 +1007,6 @@ class MainActivity : AppCompatActivity() {
         private const val REQUEST_SAVE_FILE_TAB = 103
         private const val REQUEST_OPEN_FILE = 102
         private const val REQUEST_OPEN_MULTIPLE_FILES = 104
+        private const val REQUEST_SAVE_DEFAULT_FOLDER = 105
     }
 }

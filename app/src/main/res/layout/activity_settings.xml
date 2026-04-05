@@ -252,6 +252,32 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/settingSaveFolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="16dp"
+            android:background="?attr/selectableItemBackground">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/setting_save_folder"
+                android:textColor="@color/kodaText"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/textSaveFolderValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/setting_save_folder_default"
+                android:textColor="@color/kodaTextSecondary"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -40,6 +40,17 @@
     <string name="setting_wrap_lines_desc">Zalamovať riadok ak je text príliš dlhý</string>
     <string name="setting_wake_lock">Použiť WakeLock</string>
     <string name="setting_wake_lock_desc">Zabrániť zariadeniu ísť do spiaceho režimu</string>
+    <string name="setting_save_folder">Priečinok na ukladanie</string>
+    <string name="setting_save_folder_desc">Predvolený priečinok na ukladanie nových súborov</string>
+    <string name="setting_save_folder_default">Klepnite pre výber predvoleného priečinka na ukladanie</string>
+    <string name="setting_save_folder_changed">Priečinok na ukladanie zmenený</string>
+    <string name="select_folder">Vybrať priečinok</string>
+    <string name="choose_folder">Vybrať priečinok</string>
+    <string name="later">Neskôr</string>
+    <string name="folder_selected">Priečinok vybraný</string>
+    <string name="folder_selected_to">Priečinok nastavený: %1$s</string>
+    <string name="setup_save_folder">Nastaviť priečinok na ukladanie</string>
+    <string name="setup_save_folder_message">Vyberte predvolený priečinok, kam sa budú ukladať vaše súbory. Môžete to zmeniť neskôr v Nastaveniach.</string>
     
     <string name="setting_language">Jazyk</string>
     <string name="setting_font">Písmo</string>
@@ -63,6 +74,13 @@
     <string name="save">Uložiť</string>
     <string name="dont_save">Neukladať</string>
     <string name="save_changes">Chcete uložiť zmeny do %1$s?</string>
+    <string name="enter_file_name">Zadajte názov súboru</string>
+    <string name="file_name_hint">Názov súboru</string>
+    <string name="select_save_location">Vybrať umiestnenie na uloženie</string>
+    <string name="save_location_required">Prosím vyberte umiestnenie na uloženie</string>
+    <string name="file_exists">Súbor existuje</string>
+    <string name="file_exists_message">Súbor s týmto názvom už existuje. Chcete ho nahradiť?</string>
+    <string name="replace">Nahradiť</string>
     
     <!-- Messages -->
     <string name="nothing_to_save">Nie je čo ukladať</string>
