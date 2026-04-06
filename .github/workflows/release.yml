@@ -1,0 +1,57 @@
+name: Release Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Get version from build.gradle.kts
+        id: version
+        run: |
+          VERSION=$(grep -oP 'versionName\s*=\s*"\K[^"]+' app/build.gradle.kts)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Build release APKs
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease
+
+      - name: Rename APKs
+        run: |
+          cd app/build/outputs/apk/release/
+          
+          for apk in *.apk; do
+            if [[ "$apk" == *arm64-v8a* ]]; then
+              mv "$apk" "Koda.${{ steps.version.outputs.VERSION }}.arm64-v8a.apk"
+            elif [[ "$apk" == *armeabi-v7a* ]]; then
+              mv "$apk" "Koda.${{ steps.version.outputs.VERSION }}.armeabi-v7a.apk"
+            fi
+          done
+          
+          ls -la
+
+      - name: Create release-apks zip
+        run: |
+          cd app/build/outputs/apk/release/
+          zip -j release-apks.zip Koda.*.apk
+
+      - name: Upload release-apks.zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apks.zip
+          path: app/build/outputs/apk/release/release-apks.zip
