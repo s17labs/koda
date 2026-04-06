@@ -40,6 +40,10 @@ jobs:
               mv "$apk" "Koda.${{ steps.version.outputs.VERSION }}.arm64-v8a.apk"
             elif [[ "$apk" == *armeabi-v7a* ]]; then
               mv "$apk" "Koda.${{ steps.version.outputs.VERSION }}.armeabi-v7a.apk"
+            elif [[ "$apk" == *x86_64* ]]; then
+              rm -f "$apk"
+            elif [[ "$apk" == *x86* ]]; then
+              rm -f "$apk"
             fi
           done
           
