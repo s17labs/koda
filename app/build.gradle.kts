@@ -26,7 +26,6 @@ android {
         debug {
             isDebuggable = true
             isMinifyEnabled = false
-            isJniDebuggable = true
         }
         release {
             isMinifyEnabled = false
@@ -40,8 +39,7 @@ android {
     splits {
         abi {
             isEnable = true
-            reset()
-            include("arm64-v8a", "armeabi-v7a")
+            include("armeabi-v7a", "arm64-v8a")
             isUniversalApk = false
         }
     }

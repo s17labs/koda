@@ -25,7 +25,10 @@ jobs:
           ./gradlew assembleDebug
 
       - name: List build output
-        run: ls -la app/build/outputs/apk/debug/ || echo "Debug folder not found"
+        run: |
+          ls -la app/build/outputs/apk/ 2>/dev/null || echo "APK folder not found"
+          ls -la app/build/outputs/apk/debug/ 2>/dev/null || echo "Debug folder not found"
+          find app/build/outputs -name "*.apk" 2>/dev/null || echo "No APKs found"
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
