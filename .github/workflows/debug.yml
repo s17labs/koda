@@ -24,6 +24,9 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
+      - name: List build output
+        run: ls -la app/build/outputs/apk/debug/ || echo "Debug folder not found"
+
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
