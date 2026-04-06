@@ -10,12 +10,12 @@ repositories {
 
 android {
     namespace = "com.s17labs.koda"
-    compileSdk = 35
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.s17labs.koda"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 33
         versionCode = 1
         versionName = "0.1.0"
 
