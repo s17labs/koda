@@ -1,5 +1,31 @@
 # Contributing to Koda
 
+## Project Structure
+
+```
+app/
+  ├── java/com/s17labs/koda/
+  │   ├── model/              # Data models
+  │   ├── MainActivity.kt     # Main editor screen
+  │   ├── SettingsActivity.kt # Settings screen
+  │   ├── Custom*.kt          # Custom UI components
+  │   └── DebugLog*.kt        # Debug logging
+  ├── res/
+  │   ├── layout/             # XML layouts
+  │   ├── values/             # Strings, colors, themes
+  │   ├── values-sk/          # Slovak translations
+  │   └── drawable/           # Icons and drawables
+  └── AndroidManifest.xml
+```
+
+## Tech Stack
+
+| Aspect | Details |
+|--------|---------|
+| Language | Kotlin 1.8.10 |
+| SDK | compileSdk 35, minSdk 26 |
+| Build | Gradle 7.4.2 with Kotlin DSL |
+
 ## General Guidelines
 
 - **Commit Messages**: Use clear, concise commit messages that describe what changed and why. Follow the format:
