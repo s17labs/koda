@@ -1,77 +1,37 @@
 # Koda
 
-A clean and lightweight Android text editor built with Kotlin.
+A clean, lightweight text editor for Android.
 
-## ✨ Features
+## Features
 
-### File Management
-- 📄 Create, open, and edit text files
-- 💾 Save files with auto-incrementing names (koda-file_1.txt, etc.)
-- 💾 Save As with custom filename input
-- 📂 Open single or multiple files at once
-- 📁 Customizable default save folder
-- 🔄 File exists confirmation when replacing files
-- 📝 Unsaved changes detection with save prompts
+- **Multi-tab editing** — work with several files at once
+- **File management** — create, open, save, and save-as with smart auto-naming
+- **Unsaved changes detection** — prompted before closing or switching away
+- **Customizable** — font family, font size, line wrap, default save folder, auto-save, and more
+- **WakeLock** — keep the screen on while editing
+- **Dark theme** throughout
+- **English and Slovak** language support
 
-### Interface
-- 🗂️ Multiple tabs for working with several files simultaneously
-- 📱 Start page for quick access to common actions
-- ⚫ Dark theme with custom-styled dialogs
-- 📜 Scrollable content for all screen orientations
+## Screenshot
 
-### Settings
-- ⚙️ Auto Save - automatically save files when leaving the app
-- 🔄 Open New File - start with a new empty file on launch
-- 🔄 Open Last File - continue editing the last opened file
-- 📦 Wrap Lines - toggle line wrapping
-- 🔒 WakeLock - prevent device from sleeping while editing
-- 📂 Save Folder - select a default folder for new files
-- 🔤 Font - choose between Monospace, Serif, or Sans Serif
-- 📏 Font Size - select from XS, S, M, ML, L, or XL
-- 🌍 Language - switch between English and Slovak
+<img width="320" alt="Screenshot_20260419-210201" src="https://github.com/user-attachments/assets/d10f2efd-1099-413f-80eb-1edf9646fbfe" />
 
-### Developer Tools
-- 📋 Debug Log - view and export application logs
+## Getting Started
 
-## 🛠 Tech Stack
-
-| Aspect | Details |
-|--------|---------|
-| SDK | compileSdk 35, minSdk 26 |
-| Language | Kotlin 1.8.10 |
-| Build | Gradle 7.4.2 with Kotlin DSL |
-
-## 🚀 Getting Started
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/s17labs/koda.git
-   ```
-2. Open the project in Android Studio
-3. Build & run on an emulator or device
-
-## 📁 Project Structure
-
-```
-app/
-  ├── java/com/s17labs/koda
-  │   ├── model/         # Data models
-  │   ├── MainActivity.kt     # Main editor screen
-  │   ├── SettingsActivity.kt # Settings screen
-  │   ├── Custom*.kt         # Custom UI components
-  │   └── DebugLog*.kt       # Debug logging
-  ├── res/
-  │   ├── layout/        # XML layouts
-  │   ├── values/        # Strings, colors, themes
-  │   ├── values-sk/     # Slovak translations
-  │   └── drawable/      # Icons and drawables
-  └── AndroidManifest.xml
+```bash
+git clone https://github.com/s17labs/koda.git
 ```
 
-## 🤝 Contributing
+Open in Android Studio, then build and run on a device or emulator (minSdk 26).
 
-Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) for details on how to add translations and other improvements.
+## Tech
 
-## 📄 License
+Kotlin · Android SDK 35 · Gradle with Kotlin DSL
 
-This project is licensed under the MIT License.
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add translations and other improvements.
+
+## License
+
+MIT
