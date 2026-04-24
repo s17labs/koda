@@ -39,12 +39,18 @@ body {
   top: 0;
   z-index: 10;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 0.85rem 4vw;
   background: rgba(0, 11, 32, 0.75);
   border-bottom: 1px solid rgba(104, 174, 255, 0.2);
   backdrop-filter: blur(8px);
+}
+
+.topbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
 }
 
 .logo {
@@ -124,6 +130,22 @@ body {
   border-radius: 0.55rem;
   padding: 0.4rem 0.6rem;
   cursor: pointer;
+}
+
+.lang-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--koda-text-secondary);
+}
+
+.lang-selector select {
+  background: rgba(0, 21, 51, 0.85);
+  border: 1px solid rgba(104, 174, 255, 0.35);
+  color: var(--koda-text);
+  border-radius: 0.45rem;
+  padding: 0.35rem 0.45rem;
+  font: inherit;
 }
 
 .cta-row {
@@ -356,30 +378,54 @@ pre code {
 
 @media (max-width: 640px) {
   .topbar {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.5rem;
     align-items: center;
     padding: 0.75rem 1rem;
   }
 
+  .topbar-actions {
+    flex: 1;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
   .menu-toggle {
     display: inline-flex;
-    margin-left: auto;
+    order: 3;
   }
 
   .topbar nav {
     display: none;
-    width: 100%;
+    width: calc(100vw - 2rem);
+    margin-top: 0.65rem;
     flex-direction: column;
     gap: 0.45rem;
     background: rgba(0, 21, 51, 0.95);
     border: 1px solid rgba(104, 174, 255, 0.25);
     border-radius: 0.7rem;
     padding: 0.6rem;
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    top: calc(100% - 0.2rem);
   }
 
   .topbar nav.open {
     display: flex;
+  }
+
+  .lang-selector {
+    order: 2;
+  }
+
+  .lang-selector i {
+    display: none;
+  }
+
+  .lang-selector select {
+    max-width: 8rem;
   }
 
   .topbar nav a {
