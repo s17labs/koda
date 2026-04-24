@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Koda — a clean, lightweight text editor for Android with multi-tab editing, smart file management, and a beautiful dark theme."
+    />
+    <title>Koda · Android Text Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" />
+    <link rel="icon" href="app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="logo" href="#home" aria-label="Koda homepage">
+        <span class="logo-mark" aria-hidden="true">❯_</span>
+        <span class="logo-text">Koda</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="siteNav" aria-label="Toggle menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <nav id="siteNav">
+        <a href="#features"><i class="fa-regular fa-star"></i> Features</a>
+        <a href="#tech"><i class="fa-solid fa-code"></i> Tech</a>
+        <a href="https://github.com/s17labs/koda/releases/latest" target="_blank" rel="noreferrer"><i class="fa-solid fa-download"></i> Download</a>
+      </nav>
+    </header>
+
+    <main id="home">
+      <section class="hero container">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Editing made easy</p>
+          <h1><span class="hero-koda">Koda</span> is a clean, lightweight text editor for Android.</h1>
+          <p>
+            Built for focused writing and coding sessions with multi-tab editing,
+            smart file workflows, and a polished dark interface.
+          </p>
+          <div class="cta-row" id="download">
+            <a href="https://github.com/s17labs/koda" target="_blank" rel="noreferrer" class="btn btn-primary"><i class="fa-brands fa-github"></i> View on GitHub</a>
+            <a href="https://github.com/s17labs/koda/releases/latest" target="_blank" rel="noreferrer" class="btn btn-secondary"><i class="fa-solid fa-download"></i> Download</a>
+          </div>
+        </div>
+
+        <figure class="phone reveal">
+          <img
+            src="https://github.com/user-attachments/assets/d10f2efd-1099-413f-80eb-1edf9646fbfe"
+            alt="Koda app screenshot showing the dark-themed start screen"
+          />
+          <figcaption>Dark theme designed for clarity.</figcaption>
+        </figure>
+      </section>
+
+      <section id="features" class="container section">
+        <h2 class="section-title reveal">Features</h2>
+        <div class="feature-grid">
+          <article class="card reveal">
+            <h3><i class="fa-regular fa-window-restore"></i> Multi-tab editing</h3>
+            <p>Work with several files at once without breaking your flow.</p>
+          </article>
+          <article class="card reveal">
+            <h3><i class="fa-regular fa-folder-open"></i> File management</h3>
+            <p>Create, open, save, and save-as with smart auto-naming.</p>
+          </article>
+          <article class="card reveal">
+            <h3><i class="fa-regular fa-floppy-disk"></i> Unsaved change detection</h3>
+            <p>Get prompted before closing or switching away from modified files.</p>
+          </article>
+          <article class="card reveal">
+            <h3><i class="fa-solid fa-sliders"></i> Customizable editor</h3>
+            <p>Choose font family, size, line wrap, auto-save, and default save folder.</p>
+          </article>
+          <article class="card reveal">
+            <h3><i class="fa-regular fa-lightbulb"></i> WakeLock support</h3>
+            <p>Keep your screen on while writing or reviewing long documents.</p>
+          </article>
+          <article class="card reveal">
+            <h3><i class="fa-solid fa-language"></i> Language support</h3>
+            <p>Available in English and Slovak.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="tech" class="container section">
+        <h2 class="section-title reveal">Tech</h2>
+        <div class="tech-grid reveal">
+          <article class="tech-card">
+            <i class="fa-brands fa-android"></i>
+            <h3>Android SDK 35</h3>
+            <p>Built against modern Android APIs with a minimum SDK of 26.</p>
+          </article>
+          <article class="tech-card">
+            <i class="fa-solid fa-code"></i>
+            <h3>Kotlin</h3>
+            <p>Entire app written in Kotlin for concise and maintainable code.</p>
+          </article>
+          <article class="tech-card">
+            <i class="fa-solid fa-gears"></i>
+            <h3>Gradle Kotlin DSL</h3>
+            <p>Project configuration uses Gradle with Kotlin-based build scripts.</p>
+          </article>
+        </div>
+
+        <div class="split reveal">
+          <div>
+            <h3>Getting started</h3>
+            <pre><code>git clone https://github.com/s17labs/koda.git</code></pre>
+            <p>
+              Open the project in Android Studio, then build and run on a device or emulator.
+            </p>
+          </div>
+          <div>
+            <h3>Contributing & License</h3>
+            <p>
+              Want to contribute? See
+              <a href="https://github.com/s17labs/koda/blob/main/CONTRIBUTING.md" target="_blank" rel="noreferrer"><strong>CONTRIBUTING.md</strong></a>
+              for details, including translation guidelines.
+            </p>
+            <p>
+              Koda is open source under the
+              <a href="https://github.com/s17labs/koda/blob/main/LICENSE" target="_blank" rel="noreferrer"><strong>MIT License</strong></a>.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="container footer">
+      <p>© <span id="year"></span> Koda by s17 Labs.</p>
+      <div class="footer-links">
+        <a href="https://s17labs.github.io" target="_blank" rel="noreferrer"><i class="fa-solid fa-earth-europe"></i> s17 Labs</a>
+        <a href="https://github.com/s17labs/koda" target="_blank" rel="noreferrer"><i class="fa-brands fa-github"></i> GitHub</a>
+        <a href="https://x.com/s17hq" target="_blank" rel="noreferrer"><i class="fa-brands fa-x-twitter"></i> X @s17HQ</a>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
