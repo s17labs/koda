@@ -144,13 +144,20 @@ body {
 }
 
 .lang-selector select {
-  background: rgba(0, 21, 51, 0.85);
+  background: rgba(0, 62, 183, 0.22);
   border: 1px solid rgba(104, 174, 255, 0.35);
   color: var(--koda-text);
   border-radius: 0.45rem;
   height: 2rem;
-  padding: 0.3rem 1.35rem 0.3rem 0.45rem;
   font: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 0px 35px 0px 10px;
+  background-image: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9L12 15L18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="white"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  cursor: pointer;
 }
 
 .cta-row {
