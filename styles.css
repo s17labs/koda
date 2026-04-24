@@ -128,7 +128,11 @@ body {
   background: rgba(0, 62, 183, 0.22);
   color: var(--koda-text);
   border-radius: 0.55rem;
-  padding: 0.4rem 0.6rem;
+  height: 2rem;
+  min-width: 2rem;
+  padding: 0.35rem 0.55rem;
+  align-items: center;
+  justify-content: center;;
   cursor: pointer;
 }
 
@@ -144,7 +148,8 @@ body {
   border: 1px solid rgba(104, 174, 255, 0.35);
   color: var(--koda-text);
   border-radius: 0.45rem;
-  padding: 0.35rem 0.45rem;
+  height: 2rem;
+  padding: 0.3rem 1.35rem 0.3rem 0.45rem;
   font: inherit;
 }
 
@@ -402,7 +407,7 @@ pre code {
     margin-top: 0.65rem;
     flex-direction: column;
     gap: 0.45rem;
-    background: rgba(0, 21, 51, 0.95);
+    background: #001533;
     border: 1px solid rgba(104, 174, 255, 0.25);
     border-radius: 0.7rem;
     padding: 0.6rem;
@@ -429,7 +434,9 @@ pre code {
   }
 
   .topbar nav a {
-    padding: 0.3rem 0.2rem;
+    padding: 0.45rem 0.55rem;
+    background: #00204a;
+    border-radius: 0.5rem;
   }
 
   .hero h1 {
