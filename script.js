@@ -117,8 +117,24 @@ const applyLanguage = (language) => {
   }
 };
 
+const getStoredLanguage = () => {
+  try {
+    return localStorage.getItem('koda-language');
+  } catch (error) {
+    return null;
+  }
+};
+
+const setStoredLanguage = (language) => {
+  try {
+    localStorage.setItem('koda-language', language);
+  } catch (error) {
+    // Ignore storage errors (e.g., blocked Web Storage).
+  }
+};
+
 if (languageSelect) {
-  const storedLanguage = localStorage.getItem('koda-language');
+  const storedLanguage = getStoredLanguage();
   const browserLanguage = navigator.language?.toLowerCase().startsWith('sk') ? 'sk' : 'en';
   const initialLanguage = storedLanguage && translations[storedLanguage] ? storedLanguage : browserLanguage;
   applyLanguage(initialLanguage);
@@ -126,7 +142,7 @@ if (languageSelect) {
   languageSelect.addEventListener('change', (event) => {
     const selectedLanguage = event.target.value;
     applyLanguage(selectedLanguage);
-    localStorage.setItem('koda-language', selectedLanguage);
+    setStoredLanguage(selectedLanguage);
   });
 }
 
