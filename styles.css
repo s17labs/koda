@@ -59,14 +59,16 @@ body {
   align-items: center;
   text-decoration: none;
   color: var(--koda-text);
+  font-size: 1.8rem;
   font-weight: 700;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   letter-spacing: 0.4px;
 }
 
+
 .logo-mark {
-  color: var(--koda-text);
-  font-size: 1.15rem;
+  font-size: 1.55rem;
+  transform: translateY(-0.08em);
 }
 
 .topbar nav {
