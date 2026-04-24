@@ -3,18 +3,24 @@ if (year) {
   year.textContent = new Date().getFullYear();
 }
 
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('in-view');
-      }
-    });
-  },
-  { threshold: 0.2 }
-);
+const revealElements = document.querySelectorAll('.reveal');
 
-document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
+if ('IntersectionObserver' in window) {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+        }
+      });
+    },
+    { threshold: 0.2 }
+  );
+
+  revealElements.forEach((element) => observer.observe(element));
+} else {
+  revealElements.forEach((element) => element.classList.add('in-view'));
+}
 
 const menuToggle = document.getElementById('menuToggle');
 const siteNav = document.getElementById('siteNav');
