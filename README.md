@@ -1,7 +1,7 @@
-# [❯_ Koda](https://s17labs.github.io/koda)
+# ❯_ Koda
 > Editing made easy
 
-**Koda is a clean, lightweight text editor for Android.**
+**[Koda](https://s17labs.github.io/koda) is a clean, lightweight text editor for Android.**
 
 Built for focused writing and coding sessions with multi-tab editing, smart file workflows, and a polished dark interface.
 
