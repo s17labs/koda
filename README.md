@@ -12,7 +12,7 @@ Built for focused writing and coding sessions with multi-tab editing, smart file
 - **Unsaved changes detection** — Get prompted before closing or switching away from modified files.
 - **Customize editor** — Choose font family, size, line wrap, auto-save, and default save folder.
 - **WakeLock support** — Keep your screen on while writing or reviewing long documents.
-- **Language support** Available in English and Slovak.
+- **Language support** — Available in English and Slovak.
 
 ## Screenshot
 
