@@ -17,6 +17,7 @@ Built for focused writing and coding sessions with multi-tab editing, smart file
 ## Screenshot
 
 <img width="320" alt="Screenshot_20260419-210201" src="https://github.com/user-attachments/assets/d10f2efd-1099-413f-80eb-1edf9646fbfe" />
+
 Dark theme designed for clarity.
 
 ## Getting Started
