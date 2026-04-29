@@ -1,4 +1,4 @@
-# ❯_ Koda
+# [❯_ Koda](https://s17labs.github.io/koda)
 > Editing made easy
 
 **Koda is a clean, lightweight text editor for Android.**
