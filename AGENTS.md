@@ -20,12 +20,13 @@ chmod +x gradlew && ./gradlew assembleDebug      # build debug APKs (per-ABI)
 ./gradlew lint                                   # Android lint (not part of any workflow)
 ```
 
-- There is no CI on push/PR. Both workflows are manual (`workflow_dispatch`):
-  `.github/workflows/debug.yml` builds a debug APK artifact, `.github/workflows/release.yml`
-  builds release APKs, keeps only arm64-v8a/armeabi-v7a, zips them as `release-apks.zip`.
-  Verify changes locally before merging — nothing runs automatically.
+- CI (`.github/workflows/ci.yml`) runs `assembleDebug` (JDK 17) on every push to `main` and every
+  PR, uploading the arm64-v8a debug APK as an artifact; the `build` check is required by branch protection.
+  Manual workflows remain: `.github/workflows/debug.yml` builds a debug APK artifact,
+  `.github/workflows/release.yml` builds release APKs, keeps only arm64-v8a/armeabi-v7a, zips them
+  as `release-apks.zip`.
 - Local sandboxes often lack the Android SDK/JDK or other toolchains — if builds can't run locally,
-  rely on careful code review and let a manual workflow run verify. Never skip updating tests when changing shared interfaces.
+  rely on careful code review and let CI verify. Never skip updating tests when changing shared interfaces.
 
 ## Architecture
 
