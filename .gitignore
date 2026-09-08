@@ -43,6 +43,10 @@ captures/
 # Keystore files
 *.jks
 *.keystore
+# …except the committed PUBLIC release keystore (FOSS-style public signing)
+!signing/release.keystore
+keystore.properties
+keystore.properties.b64
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild

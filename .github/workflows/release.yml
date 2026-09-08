@@ -1,63 +1,179 @@
-name: Release Build
+name: Release
+
+# Cut a release by pushing a tag:
+#   git tag v0.1.2 && git push origin v0.1.2
+#
+# Produces a GitHub Release containing:
+#   - Koda.<version>.arm64-v8a.apk   (signed, most modern devices)
+#   - Koda.<version>.armeabi-v7a.apk (signed, older 32-bit)
+#   - SHA-256 checksums file
+#
+# Signing (replicated from s17labs/pebbledo):
+#   Releases are signed with the PUBLIC keystore committed at
+#   signing/release.keystore (alias koda, password koda-public) — FOSS-style
+#   public signing so every published build shares one consistent signature.
+#   A private key can take over anytime via repository secrets:
+#     ANDROID_KEYSTORE_B64       base64-encoded .jks/.keystore file
+#     ANDROID_KEYSTORE_PASSWORD  keystore password
+#     ANDROID_KEY_ALIAS          key alias
+#     ANDROID_KEY_PASSWORD       key password
+#   When secrets are set, CI writes them to keystore.properties and
+#   app/build.gradle.kts picks them up.
 
 on:
+  push:
+    tags: ['v*']
   workflow_dispatch:
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
 jobs:
-  build:
+  release:
+    name: Build & publish release
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: '17'
-          distribution: 'temurin'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3
 
-      - name: Get version from build.gradle.kts
-        id: version
-        run: |
-          VERSION=$(grep -oP 'versionName\s*=\s*"\K[^"]+' app/build.gradle.kts)
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-        shell: bash
+      - name: Set up Gradle caching
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Build release APKs
+      - name: Extract version from tag
+        id: ver
         run: |
-          chmod +x gradlew
-          ./gradlew assembleRelease
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          else
+            VERSION=$(grep -oP 'versionName\s*=\s*"\K[^"]+' app/build.gradle.kts)
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          fi
+          cat "$GITHUB_OUTPUT"
 
-      - name: Rename APKs
+      - name: Configure release signing
+        env:
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          cd app/build/outputs/apk/release/
-          
-          for apk in *.apk; do
+          if [ -n "$ANDROID_KEYSTORE_B64" ]; then
+            echo "$ANDROID_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            {
+              echo "storeFile=$RUNNER_TEMP/release.keystore"
+              echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
+              echo "keyAlias=$ANDROID_KEY_ALIAS"
+              echo "keyPassword=$ANDROID_KEY_PASSWORD"
+            } > keystore.properties
+            echo "Signing configured from secrets."
+            cat keystore.properties | sed 's/storePassword=.*/storePassword=***/; s/keyPassword=.*/keyPassword=***/'
+          else
+            echo "No signing secrets set — signing with the committed public keystore (signing/release.keystore)."
+            ls -lh signing/release.keystore
+          fi
+
+      - name: Build APKs
+        run: ./gradlew assembleDebug assembleRelease --stacktrace
+
+      - name: Stage release artifacts
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          mkdir -p dist
+          echo "Build outputs:"
+          find app/build/outputs/apk -type f -name "*.apk" -exec ls -lh {} \;
+          # Copy per-ABI release APKs to dist with public naming Koda.<version>.<abi>.apk
+          for apk in app/build/outputs/apk/release/*.apk; do
+            [ -e "$apk" ] || continue
+            echo "Found release APK: $apk"
             if [[ "$apk" == *arm64-v8a* ]]; then
-              mv "$apk" "Koda.${{ steps.version.outputs.VERSION }}.arm64-v8a.apk"
+              cp "$apk" "dist/Koda.${VERSION}.arm64-v8a.apk"
+              echo " -> dist/Koda.${VERSION}.arm64-v8a.apk"
             elif [[ "$apk" == *armeabi-v7a* ]]; then
-              mv "$apk" "Koda.${{ steps.version.outputs.VERSION }}.armeabi-v7a.apk"
-            elif [[ "$apk" == *x86_64* ]]; then
+              cp "$apk" "dist/Koda.${VERSION}.armeabi-v7a.apk"
+              echo " -> dist/Koda.${VERSION}.armeabi-v7a.apk"
+            elif [[ "$apk" == *x86_64* ]] || [[ "$apk" == *x86* ]]; then
+              echo "Skipping x86 APK $apk"
               rm -f "$apk"
-            elif [[ "$apk" == *x86* ]]; then
-              rm -f "$apk"
+            else
+              # Fallback universal APK
+              cp "$apk" "dist/Koda.${VERSION}.apk"
+              echo " -> dist/Koda.${VERSION}.apk (universal)"
             fi
           done
-          
-          ls -la
+          # Fallback if splits didn't produce expected names (e.g. app-release.apk)
+          if [ ! -f "dist/Koda.${VERSION}.arm64-v8a.apk" ] && [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
+            cp app/build/outputs/apk/release/app-release.apk "dist/Koda.${VERSION}.apk"
+          fi
+          if [ ! -f "dist/Koda.${VERSION}.arm64-v8a.apk" ] && [ ! -f "dist/Koda.${VERSION}.apk" ]; then
+            echo "::error::No release APK staged — check build outputs"
+            ls -la app/build/outputs/apk/release/
+            exit 1
+          fi
+          # Verify APKs are signed (check for APK Sig Block or META-INF)
+          for apk in dist/*.apk; do
+            echo "Verifying $apk"
+            if unzip -l "$apk" | grep -q "META-INF"; then
+              echo "  contains META-INF"
+            fi
+            # Quick check: signed APKs contain META-INF/*.SF or APK Sig Block would be present but not in zip listing
+            # We rely on Gradle signingConfig; if unsigned, install will fail
+          done
+          (cd dist && sha256sum *.apk > checksums.txt && cat checksums.txt)
+          ls -lh dist/
 
-      - name: Create release-apks zip
+      - name: Extract release notes
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
         run: |
-          rm -f app/build/outputs/apk/release/release-apks.zip
-          cd app/build/outputs/apk/release/
-          zip release-apks.zip Koda.*.arm64-v8a.apk Koda.*.armeabi-v7a.apk
-          ls -la
+          # Try to pull the "## [VERSION]" section from CHANGELOG.md if it exists
+          if [ -f CHANGELOG.md ]; then
+            awk -v ver="$VERSION" '
+              $0 ~ "^## \\[" ver "\\]" {flag=1; next}
+              /^## \[/ && flag {exit}
+              flag {print}
+            ' CHANGELOG.md > release-notes.md
+          fi
+          if [ ! -s release-notes.md ]; then
+            echo "Koda v${VERSION}" > release-notes.md
+            echo "" >> release-notes.md
+            if [ -f CHANGELOG.md ]; then
+              echo "See CHANGELOG.md for details." >> release-notes.md
+            else
+              echo "## What's new" >> release-notes.md
+              echo "" >> release-notes.md
+              echo "- Signed release builds — APKs are now properly signed and installable (fixes 'package appears to be invalid')" >> release-notes.md
+              echo "- See commits since v0.1.1 for details." >> release-notes.md
+            fi
+          fi
+          echo "--- release notes ---"
+          cat release-notes.md
 
-      - name: Upload release-apks.zip
-        uses: actions/upload-artifact@v4
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: release-apks.zip
-          path: app/build/outputs/apk/release/release-apks.zip
+          name: Koda v${{ steps.ver.outputs.version }}
+          tag_name: v${{ steps.ver.outputs.version }}
+          body_path: release-notes.md
+          generate_release_notes: true
+          make_latest: true
+          files: |
+            dist/*.apk
+            dist/checksums.txt
