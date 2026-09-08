@@ -20,9 +20,9 @@ chmod +x gradlew && ./gradlew assembleDebug      # build debug APKs (per-ABI)
 ./gradlew lint                                   # Android lint (not part of any workflow)
 ```
 
-- CI (`.github/workflows/ci.yml`) runs `assembleDebug` (JDK 17) on every push to `main` and every
+- CI (`.github/workflows/ci.yml`) runs `assembleDebug` + `testDebugUnitTest` (JDK 17) on every push to `main` and every
   PR, uploading the arm64-v8a debug APK as an artifact; the `build` check is required by branch protection.
-  `debug.yml` remains a manual `assembleDebug` artifact builder.
+  `debug.yml` remains a manual `assembleDebug` artifact builder (now with `wrapper-validation` + `setup-gradle` caching like CI/release).
   `release.yml` is now **tag-triggered** (`push: tags: ['v*']`, plus `workflow_dispatch`): it validates the Gradle wrapper,
   sets up JDK 17 + Android SDK, configures signing (secrets `ANDROID_KEYSTORE_B64`/`ANDROID_KEYSTORE_PASSWORD`/`ANDROID_KEY_ALIAS`/`ANDROID_KEY_PASSWORD` win, else the committed public `signing/release.keystore` — alias `koda`, password `koda-public`), builds `assembleDebug` + `assembleRelease` (`signingConfig` from `app/build.gradle.kts:39-71`), stages `Koda.<version>.arm64-v8a.apk` + `Koda.<version>.armeabi-v7a.apk` and publishes them directly to the GitHub Release via `softprops/action-gh-release`. No `release-apks.zip` or `checksums.txt` is produced.
 - Local sandboxes often lack the Android SDK/JDK or other toolchains — if builds can't run locally,
