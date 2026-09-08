@@ -97,8 +97,7 @@
                 android:layout_height="match_parent"
                 android:fillViewport="true"
                 android:scrollbars="vertical"
-                android:scrollbarStyle="insideInset"
-                android:smoothScrollingEnabled="true">
+                android:scrollbarStyle="insideInset">
 
                 <HorizontalScrollView
                     android:id="@+id/editorHScrollView"
@@ -106,8 +105,7 @@
                     android:layout_height="wrap_content"
                     android:fillViewport="true"
                     android:scrollbars="horizontal"
-                    android:scrollbarStyle="insideInset"
-                    android:smoothScrollingEnabled="true">
+                    android:scrollbarStyle="insideInset">
 
                     <EditText
                         android:id="@+id/textEditor"
