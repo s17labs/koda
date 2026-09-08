@@ -92,26 +92,38 @@
             android:layout_height="match_parent">
 
             <ScrollView
+                android:id="@+id/editorVScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fillViewport="true"
                 android:scrollbars="vertical"
                 android:scrollbarStyle="insideInset">
 
-                <EditText
-                    android:id="@+id/textEditor"
+                <HorizontalScrollView
+                    android:id="@+id/editorHScrollView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/kodaEditorBg"
-                    android:gravity="top|start"
-                    android:hint="@string/start_typing"
-                    android:inputType="textMultiLine|textNoSuggestions"
-                    android:padding="16dp"
-                    android:textColor="@color/kodaText"
-                    android:textColorHint="@color/kodaTextSecondary"
-                    android:textSize="14sp"
-                    android:typeface="monospace"
-                    android:scrollbars="vertical" />
+                    android:fillViewport="true"
+                    android:scrollbars="horizontal"
+                    android:scrollbarStyle="insideInset">
+
+                    <EditText
+                        android:id="@+id/textEditor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/kodaEditorBg"
+                        android:gravity="top|start"
+                        android:hint="@string/start_typing"
+                        android:inputType="textMultiLine|textNoSuggestions"
+                        android:padding="16dp"
+                        android:textColor="@color/kodaText"
+                        android:textColorHint="@color/kodaTextSecondary"
+                        android:textSize="14sp"
+                        android:typeface="monospace"
+                        android:scrollbars="none"
+                        android:overScrollMode="never" />
+
+                </HorizontalScrollView>
 
             </ScrollView>
 
