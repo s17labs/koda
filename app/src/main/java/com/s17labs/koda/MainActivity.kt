@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textEditor: EditText
     private lateinit var editorContainer: LinearLayout
     private lateinit var editorVScrollView: ScrollView
-    private lateinit var editorHScrollView: HorizontalScrollView
+    private lateinit var editorHScrollView: CustomWrapScrollView
     private lateinit var textEmptyState: TextView
     private lateinit var startPage: View
     private lateinit var tabContainer: LinearLayout
@@ -240,6 +240,11 @@ class MainActivity : AppCompatActivity() {
         // EditText measure beyond the screen so the parent HScroll pans it
         // with fling momentum instead of the stiff internal text scroller.
         textEditor.setHorizontallyScrolling(!wrapLines)
+
+        // A stock HorizontalScrollView measures its child with UNSPECIFIED
+        // width, which would keep long lines unwrapped; constrain the child
+        // to the viewport in wrap mode so lines wrap at the screen edge.
+        editorHScrollView.constrainToViewport = wrapLines
 
         if (wrapLines) {
             textEditor.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT

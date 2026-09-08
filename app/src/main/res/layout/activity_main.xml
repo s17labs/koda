@@ -99,7 +99,7 @@
                 android:scrollbars="vertical"
                 android:scrollbarStyle="insideInset">
 
-                <HorizontalScrollView
+                <com.s17labs.koda.CustomWrapScrollView
                     android:id="@+id/editorHScrollView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -123,7 +123,7 @@
                         android:scrollbars="none"
                         android:overScrollMode="never" />
 
-                </HorizontalScrollView>
+                </com.s17labs.koda.CustomWrapScrollView>
 
             </ScrollView>
 
