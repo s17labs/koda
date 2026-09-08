@@ -6,7 +6,6 @@ name: Release
 # Produces a GitHub Release containing:
 #   - Koda.<version>.arm64-v8a.apk   (signed, most modern devices)
 #   - Koda.<version>.armeabi-v7a.apk (signed, older 32-bit)
-#   - SHA-256 checksums file
 #
 # Signing (replicated from s17labs/pebbledo):
 #   Releases are signed with the PUBLIC keystore committed at
@@ -133,10 +132,7 @@ jobs:
             if unzip -l "$apk" | grep -q "META-INF"; then
               echo "  contains META-INF"
             fi
-            # Quick check: signed APKs contain META-INF/*.SF or APK Sig Block would be present but not in zip listing
-            # We rely on Gradle signingConfig; if unsigned, install will fail
           done
-          (cd dist && sha256sum *.apk > checksums.txt && cat checksums.txt)
           ls -lh dist/
 
       - name: Extract release notes
@@ -176,4 +172,3 @@ jobs:
           make_latest: true
           files: |
             dist/*.apk
-            dist/checksums.txt
