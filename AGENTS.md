@@ -22,9 +22,9 @@ chmod +x gradlew && ./gradlew assembleDebug      # build debug APKs (per-ABI)
 
 - CI (`.github/workflows/ci.yml`) runs `assembleDebug` (JDK 17) on every push to `main` and every
   PR, uploading the arm64-v8a debug APK as an artifact; the `build` check is required by branch protection.
-  Manual workflows remain: `.github/workflows/debug.yml` builds a debug APK artifact,
-  `.github/workflows/release.yml` builds release APKs, keeps only arm64-v8a/armeabi-v7a, zips them
-  as `release-apks.zip`.
+  `debug.yml` remains a manual `assembleDebug` artifact builder.
+  `release.yml` is now **tag-triggered** (`push: tags: ['v*']`, plus `workflow_dispatch`): it validates the Gradle wrapper,
+  sets up JDK 17 + Android SDK, configures signing (secrets `ANDROID_KEYSTORE_B64`/`ANDROID_KEYSTORE_PASSWORD`/`ANDROID_KEY_ALIAS`/`ANDROID_KEY_PASSWORD` win, else the committed public `signing/release.keystore` — alias `koda`, password `koda-public`), builds `assembleDebug` + `assembleRelease` (`signingConfig` from `app/build.gradle.kts:39-71`), stages `Koda.<version>.arm64-v8a.apk` + `Koda.<version>.armeabi-v7a.apk` and publishes them directly to the GitHub Release via `softprops/action-gh-release`. No `release-apks.zip` or `checksums.txt` is produced.
 - Local sandboxes often lack the Android SDK/JDK or other toolchains — if builds can't run locally,
   rely on careful code review and let CI verify. Never skip updating tests when changing shared interfaces.
 
@@ -135,21 +135,17 @@ PR rules:
   Example: `Built with ox-alpha in the OpenCode harness.`
 
 - Do **not** put AI attribution in GitHub Release notes — releases stay clean.
-- CI must pass before merging. (No automatic CI exists here — trigger `debug.yml` manually if asked.)
+- CI must pass before merging.
 
 ## Releases
 
-1. Ensure version metadata is correct (`versionName` / `versionCode` in `app/build.gradle.kts`).
-2. Run the `Release Build` workflow manually from GitHub Actions; it reads the version from
-   `app/build.gradle.kts`, builds per-ABI release APKs and uploads `release-apks.zip` as an artifact.
-3. Attach artifacts to a GitHub Release created on `main`.
+1. Ensure version metadata is correct (`versionName` / `versionCode` in `app/build.gradle.kts`) — bump for each release.
+2. Merge the version bump to `main` via PR, then cut a release by pushing a tag: `git tag vX.Y.Z && git push origin vX.Y.Z` (or use `workflow_dispatch` — it falls back to `versionName` from `app/build.gradle.kts`). The `Release` workflow (`.github/workflows/release.yml`) validates the wrapper, sets up JDK 17 + Android SDK + Gradle cache, configures signing (secrets `ANDROID_KEYSTORE_B64` etc. win, else the committed public `signing/release.keystore` — alias `koda`, password `koda-public`), builds `assembleDebug` + `assembleRelease` (`signingConfig` from `app/build.gradle.kts:39-71`), stages `Koda.<version>.arm64-v8a.apk` + `Koda.<version>.armeabi-v7a.apk` and publishes them directly to the GitHub Release via `softprops/action-gh-release` (with `generate_release_notes: true`). No `release-apks.zip` or `checksums.txt` is produced.
+3. Verify: `gh release view vX.Y.Z --json assets --jq '.assets[].name'` should show the two signed APKs; `python -c "b'APK Sig Block 42' in open('Koda.X.Y.Z.arm64-v8a.apk','rb').read()"` should be `True` (signed). Install on device to confirm.
 
 ## Gotchas
 
-- `OpenFile.toJson/fromJson` is a naive pipe-delimited format (`name|path|content`), not real JSON:
-  file content containing `|` gets truncated on restore because parsing keeps `parts[2]`. Handle with
-  care when touching session restore; fix the format before building on it.
-- ABI splits are enabled and x86/x86_64 outputs are intentionally deleted during release packaging —
-  do not "fix" the missing universal APK.
-- The dependency set is old (appcompat 1.2.0, Kotlin stdlib 1.8.10, JVM target 1.8); keep changes
-  compatible instead of modernizing versions opportunistically.
+- `OpenFile.toJson/fromJson` is pipe-delimited (`name|path|content`) with escaping (`\|` / `\\`) and backward-compatible re-joining of `parts[2..]` (`app/src/main/java/com/s17labs/koda/model/OpenFile.kt:33-76`), not real JSON. Content containing `|` is now preserved; still handle with care when touching session restore and keep escaping in sync.
+- ABI splits are enabled and x86/x86_64 outputs are intentionally deleted during release packaging (`app/build.gradle.kts:74-79`, `.github/workflows/release.yml:111-113`) — do not "fix" the missing universal APK.
+- Release APKs are signed via `signing/release.keystore` (PKCS12, alias `koda`, password `koda-public`, committed publicly like `s17labs/pebbledo`) with optional override via `keystore.properties` / `ANDROID_KEYSTORE_B64` secrets (`app/build.gradle.kts:13-57`). Switching signing keys later requires uninstall/reinstall for users.
+- The dependency set is old (appcompat 1.2.0, Kotlin stdlib 1.8.10, JVM target 1.8); keep changes compatible instead of modernizing versions opportunistically.
