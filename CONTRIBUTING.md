@@ -23,8 +23,8 @@ app/
 | Aspect | Details |
 |--------|---------|
 | Language | Kotlin 1.8.10 |
-| SDK | compileSdk 35, minSdk 26 |
-| Build | Gradle 7.4.2 with Kotlin DSL |
+| SDK | compileSdk 33, minSdk 26 |
+| Build | Gradle 7.6.4 with Kotlin DSL |
 
 ## General Guidelines
 
