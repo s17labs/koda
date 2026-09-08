@@ -10,20 +10,70 @@ data class OpenFile(
     var isNew: Boolean = true
 ) {
     fun toJson(): String {
-        return "$name|$path|$content"
+        return "${escape(name)}|${escape(path ?: "")}|${escape(content)}"
     }
 
     companion object {
         fun fromJson(data: String): OpenFile? {
-            val parts = data.split("|")
+            val parts = splitEscaped(data)
             if (parts.size < 3) return null
+            // Sessions saved before escaping existed contain raw pipes:
+            // rejoin everything after the path so they restore in full too.
+            val path = unescape(parts[1])
+            val content = unescape(parts.subList(2, parts.size).joinToString("|"))
             return OpenFile(
-                name = parts[0],
-                path = parts[1].ifEmpty { null },
-                content = parts[2],
-                originalContent = parts[2],
-                isNew = parts[1].isEmpty()
+                name = unescape(parts[0]),
+                path = path.ifEmpty { null },
+                content = content,
+                originalContent = content,
+                isNew = path.isEmpty()
             )
+        }
+
+        private fun escape(value: String): String =
+            value.replace("\\", "\\\\").replace("|", "\\|")
+
+        private fun unescape(value: String): String {
+            val out = StringBuilder(value.length)
+            var i = 0
+            while (i < value.length) {
+                val c = value[i]
+                if (c == '\\' && i + 1 < value.length) {
+                    val next = value[i + 1]
+                    if (next == '|' || next == '\\') {
+                        out.append(next)
+                        i += 2
+                        continue
+                    }
+                }
+                out.append(c)
+                i++
+            }
+            return out.toString()
+        }
+
+        private fun splitEscaped(value: String): List<String> {
+            val parts = mutableListOf<String>()
+            val current = StringBuilder()
+            var i = 0
+            while (i < value.length) {
+                val c = value[i]
+                if (c == '\\' && i + 1 < value.length && value[i + 1] == '|') {
+                    current.append("\\|")
+                    i += 2
+                    continue
+                }
+                if (c == '|') {
+                    parts.add(current.toString())
+                    current.clear()
+                    i++
+                    continue
+                }
+                current.append(c)
+                i++
+            }
+            parts.add(current.toString())
+            return parts
         }
     }
 }
