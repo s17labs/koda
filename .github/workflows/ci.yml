@@ -32,6 +32,12 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # v3 default (tools + platform-tools) breaks: the obsolete
+          # `tools` package was removed from the SDK repo, so sdkmanager
+          # exits 1 with "Failed to find package 'tools'". The runner
+          # already ships platform-tools; Gradle fetches the rest.
+          packages: ''
 
       - name: Set up Gradle caching
         uses: gradle/actions/setup-gradle@v4
