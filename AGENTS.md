@@ -17,7 +17,8 @@ Storage Access Framework, with unsaved-changes prompts, autosave, WakeLock suppo
 ```bash
 chmod +x gradlew && ./gradlew assembleDebug      # build debug APKs (per-ABI)
 ./gradlew testDebugUnitTest                      # unit tests (placeholder ExampleUnitTest sourceset)
-./gradlew lint                                   # Android lint (not part of any workflow)
+./gradlew connectedDebugAndroidTest             # device tests; requires a compatible emulator/device
+./gradlew lintDebug                              # Android lint (not part of CI)
 ```
 
 - CI (`.github/workflows/ci.yml`) runs `assembleDebug` + `testDebugUnitTest` (JDK 17) on every push to `main` and every
@@ -33,6 +34,8 @@ chmod +x gradlew && ./gradlew assembleDebug      # build debug APKs (per-ABI)
 ```
 app/src/main/java/com/s17labs/koda/
   KodaApp.kt             # Application: init DebugLog + global uncaught-exception crash handler
+  EditorScrollView.kt    # shared two-axis editor viewport, wrapping, gestures and caret visibility
+  DialogActionLayout.kt  # responsive dialog actions: horizontal when they fit, stacked otherwise
   MainActivity.kt        # editor screen: tab bar, SAF open/save/save-as, TextWatcher dirty
                          # tracking, WakeLock, intent-based file opening, locale switching
   SettingsActivity.kt    # preferences: font family/size, line wrap, auto-save, open-last,
@@ -65,7 +68,10 @@ Key patterns:
 
 ## UI Conventions
 
-- Dark theme throughout; dialogs use square corners (0 dp radius) per project convention.
+- Dark theme throughout, including under light system mode; dialogs use the settings background and square corners (0 dp radius).
+- Dialog actions use `KodaDialogButton`; two-action dialogs use its `Secondary` variant for the secondary action. Use `DialogActionLayout` for actions that may need to stack. Keep square pressed feedback and consistent title/content/action spacing.
+- Radio indicators keep the same outer size and border width in both states, with an inset accent square for the selected state.
+- Keep language/font preference keys separate from localized display labels. Preserve `Slovak` and font keys `XS`, `S`, `M`, `ML`, `L`, `XL`.
 - Use the existing `Custom*Dialog` classes for confirmations, text input and options rather than
   inflating new stock dialogs, so styling stays consistent.
 

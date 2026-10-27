@@ -1,129 +1,63 @@
 # Contributing to Koda
 
-## Project Structure
+## Project structure
 
-```
-app/
-  ├── java/com/s17labs/koda/
-  │   ├── model/              # Data models
-  │   ├── MainActivity.kt     # Main editor screen
-  │   ├── SettingsActivity.kt # Settings screen
-  │   ├── Custom*.kt          # Custom UI components
-  │   └── DebugLog*.kt        # Debug logging
-  ├── res/
-  │   ├── layout/             # XML layouts
-  │   ├── values/             # Strings, colors, themes
-  │   ├── values-sk/          # Slovak translations
-  │   └── drawable/           # Icons and drawables
-  └── AndroidManifest.xml
-```
-
-## Tech Stack
-
-| Aspect | Details |
-|--------|---------|
-| Language | Kotlin 1.8.10 |
-| SDK | compileSdk 33, minSdk 26 |
-| Build | Gradle 7.6.4 with Kotlin DSL |
-
-## General Guidelines
-
-- **Commit Messages**: Use clear, concise commit messages that describe what changed and why. Follow the format:
-  - `feat: add new feature` for new features
-  - `fix: resolve issue with...` for bug fixes
-  - `refactor: restructure...` for code refactoring
-  - `docs: update README` for documentation changes
-  - `chore: update dependencies` for maintenance tasks
-
-- **Code Style**: Follow Kotlin conventions used in the project. Use meaningful variable and function names.
-
-- **Testing**: Test your changes thoroughly before submitting. For language additions, verify all UI elements display correctly.
-
-## Adding New Languages
-
-To add a new language to Koda, you need to make changes in three places:
-
-### 1. Update SettingsActivity.kt
-
-Add the language to the `languages` list and handle the locale:
-
-```kotlin
-// Add to languages list (around line 39)
-private val languages = listOf("English", "French", "German", "Japanese", "YourLanguage")
-
-// Add to applyLocale() function (around line 57)
-private fun applyLocale() {
-    val language = prefs.getString("language", "English")
-    val locale = when (language) {
-        "French" -> Locale("fr")
-        "German" -> Locale("de")
-        "Japanese" -> Locale("ja")
-        "YourLanguage" -> Locale("your_language_code")  // e.g., "pt" for Portuguese
-        else -> Locale.ENGLISH
-    }
-    // ... rest of function
-}
+```text
+app/src/
+  main/
+    java/com/s17labs/koda/
+      model/                 # File and menu models
+      MainActivity.kt        # Editor screen and file workflows
+      EditorScrollView.kt    # Two-axis editor viewport
+      SettingsActivity.kt    # Preferences and locale selection
+      Custom*Dialog.kt       # Shared custom dialogs
+      DialogActionLayout.kt  # Responsive dialog action placement
+      CustomToggleView.kt    # Settings switches
+      DebugLog*.kt           # Debug logging
+    res/
+      layout/                # Screen and dialog layouts
+      values/                # English strings, arrays, colors, styles and themes
+      values-sk/             # Slovak translations
+      drawable/              # Icons, radio indicators and button backgrounds
+    AndroidManifest.xml
+  test/                      # JVM tests
+  androidTest/               # Device tests and test-only manifest
 ```
 
-### 2. Update MainActivity.kt
+## Build and test
 
-Add the same locale mapping in `applyLocale()`:
+Use JDK 17, Android SDK 33 and the included Gradle 7.6.4 wrapper. The app uses Kotlin 1.8.10 and supports Android API 26 and newer.
 
-```kotlin
-// Around line 154
-private fun applyLocale() {
-    val language = prefs.getString("language", "English")
-    val locale = when (language) {
-        "French" -> Locale("fr")
-        "German" -> Locale("de")
-        "Japanese" -> Locale("ja")
-        "YourLanguage" -> Locale("your_language_code")
-        else -> Locale.ENGLISH
-    }
-    // ... rest of function
-}
+```bash
+./gradlew assembleDebug testDebugUnitTest
+# With a compatible emulator or device connected:
+./gradlew connectedDebugAndroidTest
+./gradlew lintDebug
 ```
 
-### 3. Create Language Resource Directory
+Debug APKs are written under `app/build/outputs/apk/debug/`. The repository enables ABI-specific outputs and does not configure a separate debug application ID by default. Installing a normal debug build may conflict with an installed release; use a separate application ID when preparing a side-by-side test build.
 
-Create a new directory in `app/src/main/res/` following this pattern:
+CI builds debug APKs and runs JVM tests. Device tests and lint require separate execution. Lint currently reports existing issues with the menu tint attribute, the Slovak `file_exists` format string and two app-link URL declarations; distinguish these from regressions in your changes.
 
-```
-values-xx/
-```
+`EditorScrollViewTest` covers scrolling on both axes, diagonal gestures, wrapping, viewport/font changes, caret visibility, pointer switching, fling reset, mouse input, accessibility and saved state. When changing the editor viewport, run the device tests as well as JVM tests.
 
-Where `xx` is the [ISO 639-1 language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes). For example:
-- `values-fr` for French
-- `values-de` for German  
-- `values-ja` for Japanese
-- `values-pt` for Portuguese
+For UI changes, check English and Slovak, narrow screens, larger text, keyboard resizing and both Android light/dark system modes. Koda retains its dark palette in both modes. Confirm that long dialog actions fit or stack, only one action is primary in a two-button dialog, and selected radio indicators keep the same outer size as unselected ones. See [editor and settings](docs/editor-and-settings.md) for expected behavior.
 
-Inside this directory, create a `strings.xml` file with your translations. You can copy the English `strings.xml` and translate the values.
+## Code and review guidelines
 
-### Example: Creating French translations
+Follow existing Kotlin conventions and reuse the custom dialogs, `DialogActionLayout` and shared `KodaDialogButton` styles. Keep square corners and press feedback, consistent spacing and the settings background. Use `EditorScrollView` as the editor viewport rather than nesting horizontal and vertical scroll containers.
 
-1. Create directory: `app/src/main/res/values-fr/`
-2. Create file: `app/src/main/res/values-fr/strings.xml`
-3. Translate strings (example):
+Keep commits focused and use `type(scope): short imperative summary`, for example `fix(editor): preserve caret visibility` or `docs(app): describe settings controls`. Open a PR against `main`; include validation results and before/after UI evidence uploaded directly to GitHub. Do not commit APKs or review-only screenshots. See [AGENTS.md](AGENTS.md) for repository-specific review and release conventions.
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">Koda</string>
-    <string name="start_typing">Commencez à écrire…</string>
-    <string name="menu_new">Nouveau</string>
-    <string name="menu_open">Ouvrir</string>
-    <string name="menu_save">Enregistrer</string>
-    <string name="menu_settings">Paramètres</string>
-    <!-- Continue translating all strings -->
-</resources>
-```
+## Translations and preference compatibility
 
-## Testing
+English strings live in `app/src/main/res/values/strings.xml`; Slovak strings live in `values-sk/strings.xml`. Add new user-visible strings to both, preserving resource names and format placeholders. The `font_size_labels` array references localized strings, so its order must match the stored font-size keys: `XS`, `S`, `M`, `ML`, `L`, `XL`.
 
-After adding a new language:
-1. Build and run the app
-2. Go to Settings
-3. Change language to your new language
-4. Verify all UI elements display correctly
-5. Check that the app persists the language after restart
+Language preference keys and display labels are separate. The stored key `Slovak` is displayed as **Slovak (Slovenčina)**. Do not rename existing stored keys when changing visible labels.
+
+To add a language:
+
+1. Create `app/src/main/res/values-xx/strings.xml` for its Android locale qualifier and translate the English resources, including font-size labels.
+2. Add its stable preference key to `languages` and corresponding display label to `languageLabels` in `SettingsActivity`. Keep the lists in the same order.
+3. Add the locale mapping in `applyLocale()` in both `SettingsActivity` and `MainActivity`, preserving English and Slovak mappings.
+4. Build, select the language in Settings, inspect dialogs and labels for clipping, and verify the choice persists after restart. Check format placeholders and existing saved font-size selections.
