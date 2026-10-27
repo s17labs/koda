@@ -12,7 +12,6 @@ import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -29,8 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var textEditor: EditText
     private lateinit var editorContainer: LinearLayout
-    private lateinit var editorVScrollView: ScrollView
-    private lateinit var editorHScrollView: CustomWrapScrollView
+    private lateinit var editorScrollView: EditorScrollView
     private lateinit var textEmptyState: TextView
     private lateinit var startPage: View
     private lateinit var tabContainer: LinearLayout
@@ -236,39 +234,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyWrapLinesSetting(wrapLines: Boolean) {
-        // setHorizontallyScrolling(false) wraps long lines; true lets the
-        // EditText measure beyond the screen so the parent HScroll pans it
-        // with fling momentum instead of the stiff internal text scroller.
-        textEditor.setHorizontallyScrolling(!wrapLines)
-
-        // A stock HorizontalScrollView measures its child with UNSPECIFIED
-        // width, which would keep long lines unwrapped; constrain the child
-        // to the viewport in wrap mode so lines wrap at the screen edge.
-        editorHScrollView.constrainToViewport = wrapLines
-
-        if (wrapLines) {
-            textEditor.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-            textEditor.minWidth = 0
-            editorHScrollView.isHorizontalScrollBarEnabled = false
-            editorHScrollView.scrollTo(0, 0)
-        } else {
-            textEditor.layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
-            editorHScrollView.isHorizontalScrollBarEnabled = true
-            // Short lines should still fill the viewport so background and
-            // tap targets cover the screen; post for the post-layout width.
-            editorHScrollView.post {
-                if (!prefs.getBoolean("wrap_lines", true)) {
-                    textEditor.minWidth = editorHScrollView.width
-                }
-            }
-        }
-        textEditor.requestLayout()
-
-        // Short files should still fill the viewport height (keeps the old
-        // fillViewport stretch behavior) so background/taps cover the screen.
-        editorVScrollView.post {
-            textEditor.minHeight = editorVScrollView.height
-        }
+        editorScrollView.wrapLines = wrapLines
     }
 
     override fun onPause() {
@@ -346,15 +312,7 @@ class MainActivity : AppCompatActivity() {
         tabContainer = findViewById(R.id.tabContainer)
         tabScrollView = findViewById(R.id.tabScrollView)
         toolbarTitle = findViewById(R.id.toolbarTitle)
-        editorVScrollView = findViewById(R.id.editorVScrollView)
-        editorHScrollView = findViewById(R.id.editorHScrollView)
-
-        // Dedicated parent scrollers pan with fling momentum; the EditText
-        // itself just grows to fit content and draws no bars or edge glows.
-        editorVScrollView.isSmoothScrollingEnabled = true
-        editorVScrollView.isFillViewport = true
-        editorHScrollView.isSmoothScrollingEnabled = true
-        editorHScrollView.isFillViewport = true
+        editorScrollView = findViewById(R.id.editorScrollView)
         textEditor.isVerticalScrollBarEnabled = false
         textEditor.isHorizontalScrollBarEnabled = false
         textEditor.overScrollMode = View.OVER_SCROLL_NEVER
@@ -764,7 +722,7 @@ class MainActivity : AppCompatActivity() {
     private fun switchToFile(file: OpenFile) {
         currentFile = file
         textEditor.setText(file.content)
-        editorHScrollView.scrollTo(0, 0)
+        editorScrollView.resetScroll()
         
         for (i in 0 until tabContainer.childCount) {
             val tab = tabContainer.getChildAt(i)

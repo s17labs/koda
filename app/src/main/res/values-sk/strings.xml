@@ -61,7 +61,7 @@
     
     <string name="version">Verzia</string>
     <string name="about_koda">O Koda</string>
-    <string name="about_koda_desc">Len tak pre info</string>
+    <string name="about_koda_desc">Verzia aplikácie a informácie o projekte</string>
     <string name="about_content">Toto je čistý a jednoduchý textový editor pre Android vytvorený v Kotline.\n\nViac info na: https://github.com/s17labs/koda</string>
     
     <!-- Dialogs -->
@@ -101,4 +101,12 @@
     <string name="logs_exported">Logy úspešne exportované</string>
     <string name="export_failed">Export logov zlyhal</string>
     <string name="no_logs">Zatiaľ žiadne logy</string>
+
+    <string name="language_slovak">Slovak (Slovenčina)</string>
+    <string name="font_size_extra_small">Veľmi malé</string>
+    <string name="font_size_small">Malé</string>
+    <string name="font_size_medium">Stredné</string>
+    <string name="font_size_medium_large">Stredne veľké</string>
+    <string name="font_size_large">Veľké</string>
+    <string name="font_size_extra_large">Veľmi veľké</string>
 </resources>

@@ -4,9 +4,9 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:paddingHorizontal="24dp"
+    android:paddingHorizontal="16dp"
     android:paddingTop="28dp"
-    android:paddingBottom="24dp"
+    android:paddingBottom="12dp"
     android:background="@drawable/dialog_background"
     android:elevation="12dp">
 
@@ -53,5 +53,14 @@
         android:lineSpacingExtra="4dp"
         android:layout_marginTop="24dp"
         android:layout_marginHorizontal="8dp" />
+
+    <Button
+        style="@style/KodaDialogButton"
+        android:id="@+id/btnOk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="12dp"
+        android:text="@string/ok" />
 
 </LinearLayout>

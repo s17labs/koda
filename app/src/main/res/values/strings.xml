@@ -64,7 +64,7 @@
     
     <string name="version">Version</string>
     <string name="about_koda">About Koda</string>
-    <string name="about_koda_desc">Just a little FYI</string>
+    <string name="about_koda_desc">App version and project information</string>
     <string name="about_content">This is a clean and simple Android text editor made in Kotlin.\n\nFor more visit: https://github.com/s17labs/koda</string>
     
     <!-- Dialogs -->
@@ -103,4 +103,12 @@
     <string name="logs_exported">Logs exported successfully</string>
     <string name="export_failed">Failed to export logs</string>
     <string name="no_logs">No logs yet</string>
+
+    <string name="language_slovak">Slovak (Slovenčina)</string>
+    <string name="font_size_extra_small">Extra small</string>
+    <string name="font_size_small">Small</string>
+    <string name="font_size_medium">Medium</string>
+    <string name="font_size_medium_large">Medium large</string>
+    <string name="font_size_large">Large</string>
+    <string name="font_size_extra_large">Extra large</string>
 </resources>

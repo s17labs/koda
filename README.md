@@ -11,8 +11,9 @@ Built for focused writing and coding sessions with multi-tab editing, smart file
 - **File management** — Create, open, save, and save-as with smart auto-naming.
 - **Unsaved changes detection** — Get prompted before closing or switching away from modified files.
 - **Customize editor** — Choose font family, size, line wrap, auto-save, and default save folder.
+- **Editor scrolling** — Scroll vertically through documents and horizontally through long lines when line wrap is off.
 - **WakeLock support** — Keep your screen on while writing or reviewing long documents.
-- **Language support** — Available in English and Slovak.
+- **Language support** — Available in English and Slovak (Slovenčina).
 
 ## Screenshot
 
@@ -26,7 +27,13 @@ Dark theme designed for clarity.
 git clone https://github.com/s17labs/koda.git
 ```
 
-Open the project in Android Studio, then build and run on a device or emulator.
+Open the project in Android Studio with JDK 17 and Android SDK 33, then build and run on an Android 8.0 (API 26) or newer device or emulator.
+
+```bash
+./gradlew assembleDebug testDebugUnitTest
+```
+
+See [editor and settings](docs/editor-and-settings.md) for the current controls and [CONTRIBUTING.md](CONTRIBUTING.md) for build and device-test instructions.
 
 ## Tech
 

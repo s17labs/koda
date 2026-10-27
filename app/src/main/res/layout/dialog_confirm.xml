@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingHorizontal="24dp"
-    android:paddingTop="24dp"
-    android:paddingBottom="20dp"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="12dp"
     android:background="@drawable/dialog_background"
     android:elevation="12dp">
 
@@ -15,9 +15,10 @@
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
+        android:includeFontPadding="false"
         android:textStyle="bold"
         android:letterSpacing="0.02"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="12dp" />
 
     <TextView
         android:id="@+id/dialogMessage"
@@ -26,40 +27,28 @@
         android:textColor="#99AACC"
         android:textSize="15sp"
         android:lineSpacingExtra="6dp"
-        android:layout_marginBottom="28dp" />
+        android:layout_marginBottom="12dp" />
 
-    <LinearLayout
+    <com.s17labs.koda.DialogActionLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="end">
 
         <Button
+            style="@style/KodaDialogButton.Secondary"
             android:id="@+id/btnNegative"
             android:layout_width="wrap_content"
-            android:layout_height="44dp"
-            android:minWidth="100dp"
-            android:paddingHorizontal="16dp"
-            android:text="@string/cancel"
-            android:textColor="#8099BB"
-            android:textSize="15sp"
-            android:background="@drawable/btn_dialog_secondary"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_marginEnd="12dp" />
+            android:layout_height="wrap_content"
+            android:text="@string/cancel" />
 
         <Button
+            style="@style/KodaDialogButton"
             android:id="@+id/btnPositive"
             android:layout_width="wrap_content"
-            android:layout_height="44dp"
-            android:minWidth="100dp"
-            android:paddingHorizontal="16dp"
-            android:text="@string/ok"
-            android:textColor="#68AEFF"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:background="@drawable/btn_dialog_primary"
-            style="?android:attr/borderlessButtonStyle" />
+            android:layout_height="wrap_content"
+            android:text="@string/ok" />
 
-    </LinearLayout>
+    </com.s17labs.koda.DialogActionLayout>
 
 </LinearLayout>
