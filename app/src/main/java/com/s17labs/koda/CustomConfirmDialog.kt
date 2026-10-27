@@ -2,11 +2,7 @@ package com.s17labs.koda
 
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.view.Gravity
 import android.view.Window
-import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
 
@@ -45,15 +41,7 @@ class CustomConfirmDialog(context: Context) {
     fun show() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_confirm)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
-        dialog.window?.setGravity(Gravity.CENTER)
-        dialog.window?.setDimAmount(0.6f)
-        dialog.setCanceledOnTouchOutside(true)
-        dialog.show()
+        dialog.showKodaDialog()
 
         val titleView = dialog.findViewById<TextView>(R.id.dialogTitle)
         val messageView = dialog.findViewById<TextView>(R.id.dialogMessage)

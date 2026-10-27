@@ -51,6 +51,7 @@
             android:text="@string/cancel"
             android:textColor="#8099BB"
             android:textSize="15sp"
+            android:backgroundTint="@null"
             android:background="@drawable/btn_dialog_secondary"
             style="?android:attr/borderlessButtonStyle"
             android:layout_marginEnd="12dp" />
@@ -65,6 +66,7 @@
             android:textColor="#68AEFF"
             android:textSize="15sp"
             android:textStyle="bold"
+            android:backgroundTint="@null"
             android:background="@drawable/btn_dialog_primary"
             style="?android:attr/borderlessButtonStyle" />
 

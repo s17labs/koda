@@ -2,16 +2,13 @@ package com.s17labs.koda
 
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.view.Gravity
 import android.view.Window
-import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.core.widget.CompoundButtonCompat
 
 class CustomOptionDialog(context: Context) {
 
@@ -44,16 +41,9 @@ class CustomOptionDialog(context: Context) {
     }
 
     fun show() {
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_option)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
-        dialog.window?.setGravity(Gravity.CENTER)
-        dialog.window?.setDimAmount(0.6f)
-        dialog.setCanceledOnTouchOutside(true)
-        dialog.show()
+        dialog.showKodaDialog()
 
         dialog.findViewById<TextView>(R.id.dialogTitle).text = title
 
@@ -63,13 +53,18 @@ class CustomOptionDialog(context: Context) {
         options.forEachIndexed { index, option ->
             val radioButton = RadioButton(dialog.context).apply {
                 text = option
+                CompoundButtonCompat.setButtonTintList(this, null)
+                setButtonDrawable(R.drawable.radio_button_selector)
+                compoundDrawablePadding = (12 * resources.displayMetrics.density).toInt()
                 id = index
                 setTextColor(dialog.context.getColor(R.color.kodaText))
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
-                setPadding(8, 24, 8, 24)
+                val density = resources.displayMetrics.density
+                setPadding((8 * density).toInt(), (12 * density).toInt(),
+                    (8 * density).toInt(), (12 * density).toInt())
                 if (index == defaultIndex) {
                     isChecked = true
                 }

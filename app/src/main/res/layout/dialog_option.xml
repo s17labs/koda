@@ -44,6 +44,7 @@
                 android:text="@string/cancel"
                 android:textColor="#8099BB"
                 android:textSize="15sp"
+                android:backgroundTint="@null"
                 android:background="@drawable/btn_dialog_secondary"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_gravity="end" />

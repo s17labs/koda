@@ -61,7 +61,7 @@
     
     <string name="version">Verzia</string>
     <string name="about_koda">O Koda</string>
-    <string name="about_koda_desc">Len tak pre info</string>
+    <string name="about_koda_desc">Verzia aplikácie a informácie o projekte</string>
     <string name="about_content">Toto je čistý a jednoduchý textový editor pre Android vytvorený v Kotline.\n\nViac info na: https://github.com/s17labs/koda</string>
     
     <!-- Dialogs -->

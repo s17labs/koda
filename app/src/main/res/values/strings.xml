@@ -64,7 +64,7 @@
     
     <string name="version">Version</string>
     <string name="about_koda">About Koda</string>
-    <string name="about_koda_desc">Just a little FYI</string>
+    <string name="about_koda_desc">App version and project information</string>
     <string name="about_content">This is a clean and simple Android text editor made in Kotlin.\n\nFor more visit: https://github.com/s17labs/koda</string>
     
     <!-- Dialogs -->
