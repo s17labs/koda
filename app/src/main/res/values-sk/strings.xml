@@ -101,4 +101,12 @@
     <string name="logs_exported">Logy úspešne exportované</string>
     <string name="export_failed">Export logov zlyhal</string>
     <string name="no_logs">Zatiaľ žiadne logy</string>
+
+    <string name="language_slovak">Slovak (Slovenčina)</string>
+    <string name="font_size_extra_small">Veľmi malé</string>
+    <string name="font_size_small">Malé</string>
+    <string name="font_size_medium">Stredné</string>
+    <string name="font_size_medium_large">Stredne veľké</string>
+    <string name="font_size_large">Veľké</string>
+    <string name="font_size_extra_large">Veľmi veľké</string>
 </resources>

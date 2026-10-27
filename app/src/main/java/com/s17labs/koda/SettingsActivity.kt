@@ -34,6 +34,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var textSaveFolderValue: TextView
 
     private val languages = listOf("English", "Slovak")
+    private val languageLabels get() = listOf("English", getString(R.string.language_slovak))
+    private val fontSizeLabels get() = resources.getStringArray(R.array.font_size_labels).toList()
     private val fonts = listOf("Monospace", "Serif", "Sans Serif")
     private val fontSizes = listOf("XS", "S", "M", "ML", "L", "XL")
 
@@ -171,7 +173,7 @@ class SettingsActivity : AppCompatActivity() {
         switchWakeLock.isChecked = prefs.getBoolean("wake_lock", false)
 
         val language = prefs.getString("language", "English")
-        textLanguageValue.text = language
+        textLanguageValue.text = languageLabels[languages.indexOf(language).coerceAtLeast(0)]
 
         val font = prefs.getString("font", "Monospace")
         textFontValue.text = font
@@ -182,7 +184,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         val fontSize = prefs.getString("font_size", "M")
-        textFontSizeValue.text = fontSize
+        textFontSizeValue.text = fontSizeLabels[fontSizes.indexOf(fontSize).let { if (it >= 0) it else 2 }]
 
         updateOpenNewDescription(switchOpenNew.isChecked, switchOpenLast.isChecked)
         updateOpenLastDescription(switchOpenNew.isChecked, switchOpenLast.isChecked)
@@ -258,12 +260,12 @@ class SettingsActivity : AppCompatActivity() {
 
         CustomOptionDialog(this)
             .setTitle(getString(R.string.choose_language))
-            .setOptions(languages, currentIndex)
+            .setOptions(languageLabels, currentIndex)
             .setOnOkClickListener { index ->
                 val selected = languages[index]
                 prefs.edit().putString("language", selected).apply()
-                textLanguageValue.text = selected
-                Toast.makeText(this, getString(R.string.language_changed, selected), Toast.LENGTH_SHORT).show()
+                textLanguageValue.text = languageLabels[index]
+                Toast.makeText(this, getString(R.string.language_changed, languageLabels[index]), Toast.LENGTH_SHORT).show()
                 recreate()
             }
             .setOnCancelClickListener { }
@@ -297,11 +299,11 @@ class SettingsActivity : AppCompatActivity() {
 
         CustomOptionDialog(this)
             .setTitle(getString(R.string.choose_font_size))
-            .setOptions(fontSizes, currentIndex)
+            .setOptions(fontSizeLabels, currentIndex)
             .setOnOkClickListener { index ->
                 val selected = fontSizes[index]
                 prefs.edit().putString("font_size", selected).apply()
-                textFontSizeValue.text = selected
+                textFontSizeValue.text = fontSizeLabels[index]
             }
             .setOnCancelClickListener { }
             .show()
