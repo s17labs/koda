@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingHorizontal="24dp"
-    android:paddingTop="24dp"
-    android:paddingBottom="20dp"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="12dp"
     android:background="@drawable/dialog_background"
     android:elevation="12dp">
 
@@ -15,61 +15,50 @@
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
+        android:includeFontPadding="false"
         android:textStyle="bold"
         android:letterSpacing="0.02"
-        android:layout_marginBottom="20dp" />
+        android:layout_marginBottom="12dp" />
 
     <EditText
         android:id="@+id/editText"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="wrap_content"
+        android:minHeight="52dp"
         android:hint="@string/file_name_hint"
         android:textColor="#FFFFFF"
         android:textColorHint="#5577AACC"
         android:textSize="16sp"
         android:inputType="text"
-        android:maxLines="1"
+        android:singleLine="true"
         android:imeOptions="actionDone"
         android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
         android:gravity="center_vertical"
         android:background="@drawable/edit_text_background"
         android:importantForAutofill="no" />
 
-    <LinearLayout
+    <com.s17labs.koda.DialogActionLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="end"
-        android:layout_marginTop="28dp">
+        android:layout_marginTop="12dp">
 
         <Button
+            style="@style/KodaDialogButton.Secondary"
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
-            android:layout_height="44dp"
-            android:minWidth="100dp"
-            android:paddingHorizontal="16dp"
-            android:text="@string/cancel"
-            android:textColor="#8099BB"
-            android:textSize="15sp"
-            android:backgroundTint="@null"
-            android:background="@drawable/btn_dialog_secondary"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_marginEnd="12dp" />
+            android:layout_height="wrap_content"
+            android:text="@string/cancel" />
 
         <Button
+            style="@style/KodaDialogButton"
             android:id="@+id/btnOk"
             android:layout_width="wrap_content"
-            android:layout_height="44dp"
-            android:minWidth="100dp"
-            android:paddingHorizontal="16dp"
-            android:text="@string/ok"
-            android:textColor="#68AEFF"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:backgroundTint="@null"
-            android:background="@drawable/btn_dialog_primary"
-            style="?android:attr/borderlessButtonStyle" />
+            android:layout_height="wrap_content"
+            android:text="@string/ok" />
 
-    </LinearLayout>
+    </com.s17labs.koda.DialogActionLayout>
 
 </LinearLayout>
