@@ -35,6 +35,7 @@ chmod +x gradlew && ./gradlew assembleDebug      # build debug APKs (per-ABI)
 app/src/main/java/com/s17labs/koda/
   KodaApp.kt             # Application: init DebugLog + global uncaught-exception crash handler
   EditorScrollView.kt    # shared two-axis editor viewport, wrapping, gestures and caret visibility
+  SelectionEditText.kt   # selection handles, edge scrolling and viewport preservation on release
   DialogActionLayout.kt  # responsive dialog actions: horizontal when they fit, stacked otherwise
   MainActivity.kt        # editor screen: tab bar, SAF open/save/save-as, TextWatcher dirty
                          # tracking, WakeLock, intent-based file opening, locale switching

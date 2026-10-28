@@ -109,4 +109,6 @@
     <string name="font_size_medium_large">Stredne veľké</string>
     <string name="font_size_large">Veľké</string>
     <string name="font_size_extra_large">Veľmi veľké</string>
+    <string name="selection_start">Začiatok výberu</string>
+    <string name="selection_end">Koniec výberu</string>
 </resources>
