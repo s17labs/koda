@@ -132,7 +132,10 @@ class SelectionEditText @JvmOverloads constructor(
         init {
             contentDescription = context.getString(if (start) R.string.selection_start else R.string.selection_end)
         }
-        val popup = PopupWindow(this, (48 * density).roundToInt(), (48 * density).roundToInt()).apply {
+        private val touchSize = (48 * density).roundToInt()
+        private var anchorX = 0f
+        private var knobX = 0f
+        val popup = PopupWindow(this, touchSize, touchSize).apply {
             // Stay above the transparent platform handles so they cannot capture the drag.
             windowLayoutType = HANDLE_WINDOW_TYPE
             isClippingEnabled = false
@@ -143,10 +146,15 @@ class SelectionEditText @JvmOverloads constructor(
             setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
         }
 
+        override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+            super.onSizeChanged(w, h, oldw, oldh)
+            if (Build.VERSION.SDK_INT >= 29) systemGestureExclusionRects = listOf(Rect(0, 0, w, h))
+        }
+
         override fun onDraw(canvas: Canvas) {
-            val center = width / 2f
-            canvas.drawRect(center - density, 0f, center + density, 12 * density, paint)
-            canvas.drawCircle(center, 17 * density, 9 * density, paint)
+            paint.strokeWidth = 2 * density
+            canvas.drawLine(anchorX, 0f, knobX, 12 * density, paint)
+            canvas.drawCircle(knobX, 17 * density, 9 * density, paint)
         }
 
         fun position() {
@@ -159,9 +167,43 @@ class SelectionEditText @JvmOverloads constructor(
                 popup.dismiss()
                 return
             }
-            var left = (screenX - popup.width / 2f).roundToInt()
+            val (otherX, otherY) = caretPosition(!start)
+            val otherScreenX = location[0] + otherX
+            val otherScreenY = location[1] + otherY
+            val onLeft = screenX < otherScreenX || (screenX == otherScreenX && start)
+            val radius = (9 * density).coerceAtMost(visible.width() / 4f)
+            val minimumX = visible.left + radius
+            val maximumX = visible.right - radius
+            val gap = (24 * density).coerceAtMost(maximumX - minimumX)
+            val leftKnob = (minOf(screenX, otherScreenX) - 12 * density)
+                .coerceIn(minimumX, maximumX - gap)
+            val rightKnob = (maxOf(screenX, otherScreenX) + 12 * density)
+                .coerceIn(leftKnob + gap, maximumX)
+            val screenKnob = if (onLeft) leftKnob else rightKnob
+            val size = touchSize.coerceAtMost(visible.width())
+            var left = (screenKnob - size / 2f).roundToInt()
+                .coerceIn(visible.left, visible.right - size)
+            var right = left + size
             var top = screenY.roundToInt().coerceIn(visible.top,
-                (visible.bottom - popup.height).coerceAtLeast(visible.top))
+                (visible.bottom - touchSize).coerceAtLeast(visible.top))
+            val otherTop = otherScreenY.roundToInt().coerceIn(visible.top,
+                (visible.bottom - touchSize).coerceAtLeast(visible.top))
+            val otherVisible = activeHandle?.start == !start ||
+                visible.contains(otherScreenX.toInt(), (otherScreenY - 1).toInt())
+            if (otherVisible && top < otherTop + touchSize && otherTop < top + touchSize) {
+                // Partition overlapping touch targets between the outward-facing knobs.
+                // Neither popup may consume a touch intended for the other endpoint.
+                val split = ((leftKnob + rightKnob) / 2).roundToInt()
+                if (onLeft) right = minOf(right, split) else left = maxOf(left, split)
+            }
+            val popupWidth = (right - left).coerceAtLeast(1)
+            val newAnchor = screenX - left
+            val newKnob = screenKnob - left
+            if (newAnchor != anchorX || newKnob != knobX) {
+                anchorX = newAnchor
+                knobX = newKnob
+                invalidate()
+            }
             if (Build.VERSION.SDK_INT < 29) {
                 // Older PopupWindow versions position relative to the application window.
                 this@SelectionEditText.rootView.getLocationOnScreen(windowOnScreen)
@@ -169,8 +211,11 @@ class SelectionEditText @JvmOverloads constructor(
                 left -= windowOnScreen[0] - windowInWindow[0]
                 top -= windowOnScreen[1] - windowInWindow[1]
             }
-            if (popup.isShowing) popup.update(left, top, -1, -1)
-            else popup.showAtLocation(this@SelectionEditText, Gravity.NO_GRAVITY, left, top)
+            if (popup.isShowing) popup.update(left, top, popupWidth, touchSize)
+            else {
+                popup.width = popupWidth
+                popup.showAtLocation(this@SelectionEditText, Gravity.NO_GRAVITY, left, top)
+            }
         }
 
         override fun onTouchEvent(event: MotionEvent): Boolean {

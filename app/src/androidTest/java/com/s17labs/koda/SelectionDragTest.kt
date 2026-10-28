@@ -117,6 +117,60 @@ class SelectionDragTest {
         return point
     }
 
+    private fun handleBounds(start: Boolean): Rect {
+        val result = Rect()
+        onView(withContentDescription(if (start) "Selection start" else "Selection end"))
+            .inRoot(withDecorView(hasDescendant(withContentDescription(
+                if (start) "Selection start" else "Selection end"))))
+            .perform(object : ViewAction {
+                override fun getConstraints(): Matcher<View> = isDisplayed()
+                override fun getDescription() = "inspect selection touch target"
+                override fun perform(controller: UiController, view: View) {
+                    val location = IntArray(2)
+                    view.getLocationOnScreen(location)
+                    result.set(location[0], location[1], location[0] + view.width,
+                        location[1] + view.height)
+                }
+            })
+        return result
+    }
+
+    @Test fun shortSelectionsKeepBothHandlesIndependentlyDraggable() {
+        var rightEdgeStart = 0
+        ui { rightEdgeStart = editor.layout.getLineEnd(0) - 4 }
+        for (initialStart in listOf(1, 10, rightEdgeStart)) {
+            for (length in 1..2) {
+                for (startHandle in listOf(true, false)) {
+                    val initialEnd = initialStart + length
+                    ui { editor.setSelection(initialStart, initialEnd); viewport.resetScroll() }
+                    assertFalse("short selection touch targets must not overlap",
+                        Rect.intersects(handleBounds(true), handleBounds(false)))
+                    val (x, y) = handlePoint(startHandle)
+                    var characterWidth = 0f
+                    ui { characterWidth = editor.paint.measureText("i") }
+                    val down = SystemClock.uptimeMillis()
+                    event(down, MotionEvent.ACTION_DOWN, x, y)
+                    try {
+                        ui { assertTrue("visible knob receives the touch", viewport.selectionDragging) }
+                        event(down, MotionEvent.ACTION_MOVE,
+                            x + if (startHandle) -characterWidth else characterWidth, y)
+                        ui {
+                            if (startHandle) {
+                                assertTrue("start knob moves start", editor.selectionStart < initialStart)
+                                assertEquals("end remains anchored", initialEnd, editor.selectionEnd)
+                            } else {
+                                assertEquals("start remains anchored", initialStart, editor.selectionStart)
+                                assertTrue("end knob moves end", editor.selectionEnd > initialEnd)
+                            }
+                        }
+                    } finally {
+                        event(down, MotionEvent.ACTION_UP, x, y)
+                    }
+                }
+            }
+        }
+    }
+
     private fun event(down: Long, action: Int, x: Float, y: Float) {
         val motion = MotionEvent.obtain(down, SystemClock.uptimeMillis(), action, x, y, 0)
         motion.source = InputDevice.SOURCE_TOUCHSCREEN
