@@ -9,6 +9,7 @@ app/src/
       model/                 # File and menu models
       MainActivity.kt        # Editor screen and file workflows
       EditorScrollView.kt    # Two-axis editor viewport
+      SelectionEditText.kt   # Selection handles and continuous edge scrolling
       SettingsActivity.kt    # Preferences and locale selection
       Custom*Dialog.kt       # Shared custom dialogs
       DialogActionLayout.kt  # Responsive dialog action placement
@@ -39,7 +40,7 @@ Debug APKs are written under `app/build/outputs/apk/debug/`. The repository enab
 
 CI builds debug APKs and runs JVM tests. Device tests and lint require separate execution. Lint currently reports existing issues with the menu tint attribute, the Slovak `file_exists` format string and two app-link URL declarations; distinguish these from regressions in your changes.
 
-`EditorScrollViewTest` covers scrolling on both axes, diagonal gestures, wrapping, viewport/font changes, caret visibility, pointer switching, fling reset, mouse input, accessibility and saved state. When changing the editor viewport, run the device tests as well as JVM tests.
+`EditorScrollViewTest` covers scrolling on both axes, diagonal gestures, wrapping, viewport/font changes, caret visibility, pointer switching, fling reset, mouse input, accessibility and saved state. `SelectionDragTest` uses real touch gestures against the editor to cover continuous handle dragging, initial long-press drags in both directions, keyboard resizing, reaching the final character and viewport stability after release. When changing the editor viewport or selection handling, run the device tests as well as JVM tests.
 
 For UI changes, check English and Slovak, narrow screens, larger text, keyboard resizing and both Android light/dark system modes. Koda retains its dark palette in both modes. Confirm that long dialog actions fit or stack, only one action is primary in a two-button dialog, and selected radio indicators keep the same outer size as unselected ones. See [editor and settings](docs/editor-and-settings.md) for expected behavior.
 

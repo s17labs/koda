@@ -37,6 +37,10 @@ class EditorScrollView @JvmOverloads constructor(
     private var dragging = false
     private var restoredHorizontalOffset: Int? = null
 
+    internal var selectionDragging = false
+
+    internal fun resetFling() { panScroller.abortAnimation() }
+
     var wrapLines = true
         set(value) {
             field = value
@@ -229,6 +233,8 @@ class EditorScrollView @JvmOverloads constructor(
     }
 
     override fun requestChildRectangleOnScreen(child: View, rectangle: Rect, immediate: Boolean): Boolean {
+        // Keep the viewport at the dragged endpoint, including delayed toolbar refreshes.
+        if (selectionDragging || (child is SelectionEditText && child.preservesSelectionViewport)) return false
         val rect = Rect(rectangle)
         rect.offset(child.left - child.scrollX, child.top - child.scrollY)
         val x = when {

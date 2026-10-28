@@ -98,7 +98,7 @@
                 android:scrollbars="vertical|horizontal"
                 android:scrollbarStyle="insideOverlay">
 
-                <EditText
+                <com.s17labs.koda.SelectionEditText
                     android:id="@+id/textEditor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -111,6 +111,8 @@
                     android:textColorHint="@color/kodaTextSecondary"
                     android:textSize="14sp"
                     android:typeface="monospace"
+                    android:textSelectHandleLeft="@drawable/selection_handle_hidden"
+                    android:textSelectHandleRight="@drawable/selection_handle_hidden"
                     android:scrollbars="none"
                     android:overScrollMode="never" />
 
