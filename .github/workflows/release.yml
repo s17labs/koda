@@ -51,6 +51,9 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # Match CI: the obsolete tools package is no longer available.
+          packages: ''
 
       - name: Set up Gradle caching
         uses: gradle/actions/setup-gradle@v4
