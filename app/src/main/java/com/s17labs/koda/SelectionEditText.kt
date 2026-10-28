@@ -327,7 +327,10 @@ class SelectionEditText @JvmOverloads constructor(
             pointerY = event.rawY
         }
         if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) {
-            if (directSelectionGesture) stopSelectionDrag()
+            if (directSelectionGesture) {
+                extendSelection()
+                stopSelectionDrag()
+            }
             directSelectionGesture = false
         }
         return handled
