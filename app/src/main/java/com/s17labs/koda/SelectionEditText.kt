@@ -2,7 +2,6 @@ package com.s17labs.koda
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
@@ -19,6 +18,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.PopupWindow
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatEditText
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -59,7 +59,10 @@ class SelectionEditText @JvmOverloads constructor(
     private val windowInWindow = IntArray(2)
     private val viewport get() = parent as? EditorScrollView
     private val density get() = resources.displayMetrics.density
-    private val preDraw = ViewTreeObserver.OnPreDrawListener { updateHandles(); true }
+    private val preDraw = ViewTreeObserver.OnPreDrawListener {
+        if (activeHandle == null) updateHandles()
+        true
+    }
 
     init {
         customSelectionActionModeCallback = object : ActionMode.Callback {
@@ -126,15 +129,23 @@ class SelectionEditText @JvmOverloads constructor(
     }
 
     private inner class SelectionHandle(val start: Boolean) : View(context) {
-        private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = context.getColor(R.color.kodaLightBlue)
+        private val leftDrawable = AppCompatResources.getDrawable(context,
+            androidx.appcompat.R.drawable.abc_text_select_handle_left_mtrl_dark)!!.mutate().apply {
+            setTint(context.getColor(R.color.kodaLightBlue))
+        }
+        private val rightDrawable = AppCompatResources.getDrawable(context,
+            androidx.appcompat.R.drawable.abc_text_select_handle_right_mtrl_dark)!!.mutate().apply {
+            setTint(context.getColor(R.color.kodaLightBlue))
         }
         init {
             contentDescription = context.getString(if (start) R.string.selection_start else R.string.selection_end)
         }
         private val touchSize = (48 * density).roundToInt()
-        private var anchorX = 0f
-        private var knobX = 0f
+        private var drawableLeft = 0
+        private var pointsLeft = start
+        private var lastLeft = Int.MIN_VALUE
+        private var lastTop = Int.MIN_VALUE
+        private var lastWidth = 0
         val popup = PopupWindow(this, touchSize, touchSize).apply {
             // Stay above the transparent platform handles so they cannot capture the drag.
             windowLayoutType = HANDLE_WINDOW_TYPE
@@ -152,9 +163,10 @@ class SelectionEditText @JvmOverloads constructor(
         }
 
         override fun onDraw(canvas: Canvas) {
-            paint.strokeWidth = 2 * density
-            canvas.drawLine(anchorX, 0f, knobX, 12 * density, paint)
-            canvas.drawCircle(knobX, 17 * density, 9 * density, paint)
+            val drawable = if (pointsLeft) leftDrawable else rightDrawable
+            drawable.setBounds(drawableLeft, 0, drawableLeft + drawable.intrinsicWidth,
+                drawable.intrinsicHeight)
+            drawable.draw(canvas)
         }
 
         fun position() {
@@ -170,18 +182,16 @@ class SelectionEditText @JvmOverloads constructor(
             val (otherX, otherY) = caretPosition(!start)
             val otherScreenX = location[0] + otherX
             val otherScreenY = location[1] + otherY
-            val onLeft = screenX < otherScreenX || (screenX == otherScreenX && start)
-            val radius = (9 * density).coerceAtMost(visible.width() / 4f)
-            val minimumX = visible.left + radius
-            val maximumX = visible.right - radius
-            val gap = (24 * density).coerceAtMost(maximumX - minimumX)
-            val leftKnob = (minOf(screenX, otherScreenX) - 12 * density)
-                .coerceIn(minimumX, maximumX - gap)
-            val rightKnob = (maxOf(screenX, otherScreenX) + 12 * density)
-                .coerceIn(leftKnob + gap, maximumX)
-            val screenKnob = if (onLeft) leftKnob else rightKnob
+            // Use the same teardrop geometry and caret hotspot as Android's handles.
+            // Direction follows the endpoint's text run, never the other endpoint's x.
+            val offset = (if (start) selectionStart else selectionEnd).coerceIn(0, length())
+            val rtl = layout.isRtlCharAt((if (start) offset else offset - 1).coerceAtLeast(0))
+            val facesLeft = start != rtl
+            val drawable = if (facesLeft) leftDrawable else rightDrawable
+            val hotspot = drawable.intrinsicWidth * if (facesLeft) 3 / 4f else 1 / 4f
+            val idealLeft = screenX - hotspot
             val size = touchSize.coerceAtMost(visible.width())
-            var left = (screenKnob - size / 2f).roundToInt()
+            var left = (idealLeft - (size - drawable.intrinsicWidth) / 2f).roundToInt()
                 .coerceIn(visible.left, visible.right - size)
             var right = left + size
             var top = screenY.roundToInt().coerceIn(visible.top,
@@ -191,17 +201,17 @@ class SelectionEditText @JvmOverloads constructor(
             val otherVisible = activeHandle?.start == !start ||
                 visible.contains(otherScreenX.toInt(), (otherScreenY - 1).toInt())
             if (otherVisible && top < otherTop + touchSize && otherTop < top + touchSize) {
-                // Partition overlapping touch targets between the outward-facing knobs.
-                // Neither popup may consume a touch intended for the other endpoint.
-                val split = ((leftKnob + rightKnob) / 2).roundToInt()
+                val onLeft = screenX < otherScreenX || (screenX == otherScreenX && start)
+                val split = ((screenX + otherScreenX) / 2).roundToInt()
+                    .coerceIn(visible.left + 1, visible.right - 1)
                 if (onLeft) right = minOf(right, split) else left = maxOf(left, split)
             }
             val popupWidth = (right - left).coerceAtLeast(1)
-            val newAnchor = screenX - left
-            val newKnob = screenKnob - left
-            if (newAnchor != anchorX || newKnob != knobX) {
-                anchorX = newAnchor
-                knobX = newKnob
+            val newDrawableLeft = (idealLeft - left).roundToInt()
+                .coerceIn(0, (popupWidth - drawable.intrinsicWidth).coerceAtLeast(0))
+            if (newDrawableLeft != drawableLeft || facesLeft != pointsLeft) {
+                drawableLeft = newDrawableLeft
+                pointsLeft = facesLeft
                 invalidate()
             }
             if (Build.VERSION.SDK_INT < 29) {
@@ -211,11 +221,17 @@ class SelectionEditText @JvmOverloads constructor(
                 left -= windowOnScreen[0] - windowInWindow[0]
                 top -= windowOnScreen[1] - windowInWindow[1]
             }
-            if (popup.isShowing) popup.update(left, top, popupWidth, touchSize)
-            else {
+            if (popup.isShowing) {
+                if (left != lastLeft || top != lastTop || popupWidth != lastWidth) {
+                    popup.update(left, top, popupWidth, touchSize)
+                }
+            } else {
                 popup.width = popupWidth
                 popup.showAtLocation(this@SelectionEditText, Gravity.NO_GRAVITY, left, top)
             }
+            lastLeft = left
+            lastTop = top
+            lastWidth = popupWidth
         }
 
         override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -240,10 +256,11 @@ class SelectionEditText @JvmOverloads constructor(
                 MotionEvent.ACTION_MOVE -> {
                     pointerX = event.rawX
                     pointerY = event.rawY
-                    extendSelection()
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    extendSelection()
                     stopSelectionDrag()
+                    updateHandles()
                     performClick()
                 }
             }
@@ -277,7 +294,10 @@ class SelectionEditText @JvmOverloads constructor(
             directAnchorStart = -1
             directAnchorEnd = -1
         }
-        val handled = super.onTouchEvent(event)
+        // Once our long-press drag owns selection, do not also run Android's
+        // word-selection drag handler on every MOVE.
+        val handled = if (directSelectionGesture && activeHandle != null &&
+            event.actionMasked == MotionEvent.ACTION_MOVE) true else super.onTouchEvent(event)
         if (event.actionMasked == MotionEvent.ACTION_DOWN && hasSelection()) {
             directAnchorStart = selectionStart
             directAnchorEnd = selectionEnd
@@ -305,10 +325,12 @@ class SelectionEditText @JvmOverloads constructor(
             fixedOffset = if (activeHandle === startHandle) directAnchorEnd else directAnchorStart
             pointerX = event.rawX
             pointerY = event.rawY
-            extendSelection()
         }
         if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) {
-            if (directSelectionGesture) stopSelectionDrag()
+            if (directSelectionGesture) {
+                extendSelection()
+                stopSelectionDrag()
+            }
             directSelectionGesture = false
         }
         return handled
@@ -342,7 +364,6 @@ class SelectionEditText @JvmOverloads constructor(
                 pendingSelectionChange = true
             }
         }
-        updateHandles()
     }
 
     private fun edgeSpeed(coordinate: Float, low: Int, high: Int): Float {
@@ -373,8 +394,11 @@ class SelectionEditText @JvmOverloads constructor(
             val dy = (edgeSpeed(pointerY, visible.top, visible.bottom) * elapsed).roundToInt()
             if (dx != 0 || dy != 0) {
                 parent.scrollBy(dx, dy)
-                extendSelection()
             }
+            // Consume the newest pointer once per display frame. Updating selection
+            // and two popup windows for every input sample caused redundant work.
+            extendSelection()
+            updateHandles()
             postOnAnimation(this)
         }
     }

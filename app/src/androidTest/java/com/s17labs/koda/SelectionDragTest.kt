@@ -21,6 +21,8 @@ import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.hamcrest.Matcher
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -154,6 +156,11 @@ class SelectionDragTest {
                         ui { assertTrue("visible knob receives the touch", viewport.selectionDragging) }
                         event(down, MotionEvent.ACTION_MOVE,
                             x + if (startHandle) -characterWidth else characterWidth, y)
+                        val frames = CountDownLatch(1)
+                        instrumentation.runOnMainSync {
+                            editor.postOnAnimation { editor.postOnAnimation { frames.countDown() } }
+                        }
+                        assertTrue("selection is rendered within two frames", frames.await(10, TimeUnit.SECONDS))
                         ui {
                             if (startHandle) {
                                 assertTrue("start knob moves start", editor.selectionStart < initialStart)
@@ -274,7 +281,23 @@ class SelectionDragTest {
         ui { before = editor.selectionEnd; assertTrue(editor.hasSelection()) }
         SystemClock.sleep(1000)
         ui { assertTrue("held long-press drag extends selection", editor.selectionEnd > before) }
-        event(down, MotionEvent.ACTION_UP, x, bounds.bottom - 2f)
+        // Deliver the final MOVE and UP in one UI-thread turn, before another
+        // display frame can consume the pending pointer. Release must flush it.
+        ui {
+            editor.getLocationOnScreen(location)
+            val finalX = bounds.left + 100f
+            val finalY = bounds.bottom - 60f
+            val expected = editor.getOffsetForPosition(finalX - location[0], finalY - location[1])
+            assertTrue("final target differs from the previous frame", expected != editor.selectionEnd)
+            for (action in listOf(MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP)) {
+                val motion = MotionEvent.obtain(down, SystemClock.uptimeMillis(), action, finalX, finalY, 0)
+                motion.offsetLocation(-location[0].toFloat(), -location[1].toFloat())
+                editor.onTouchEvent(motion)
+                motion.recycle()
+            }
+            assertEquals("release consumes the final move before the next frame", expected, editor.selectionEnd)
+            assertFalse(viewport.selectionDragging)
+        }
     }
 
     @Test fun initialLongPressDragCanExtendUpwards() {
