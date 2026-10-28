@@ -21,6 +21,8 @@ import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.hamcrest.Matcher
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -154,6 +156,11 @@ class SelectionDragTest {
                         ui { assertTrue("visible knob receives the touch", viewport.selectionDragging) }
                         event(down, MotionEvent.ACTION_MOVE,
                             x + if (startHandle) -characterWidth else characterWidth, y)
+                        val frames = CountDownLatch(1)
+                        instrumentation.runOnMainSync {
+                            editor.postOnAnimation { editor.postOnAnimation { frames.countDown() } }
+                        }
+                        assertTrue("selection is rendered within two frames", frames.await(10, TimeUnit.SECONDS))
                         ui {
                             if (startHandle) {
                                 assertTrue("start knob moves start", editor.selectionStart < initialStart)
